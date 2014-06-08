@@ -11,19 +11,19 @@ module Control.Monad.Better.State
   where
 import qualified Control.Monad.Trans.State as Trans
 import Control.Monad.Trans.Class
-import Data.Tagged
+import Data.Proxy
 import Control.Monad.Better.Core
 
 class Monad m => MonadStateN (n :: Nat) s m where
-  stateN :: Tagged n ((s -> (a, s)) -> m a)
+  stateN :: Proxy n -> ((s -> (a, s)) -> m a)
 
 instance Monad m => MonadStateN Zero s (Trans.StateT s m) where
-  stateN = Tagged Trans.state
+  stateN _ = Trans.state
 
 instance (MonadStateN n s m, Monad m)
   => MonadStateN (Suc n) s (Trans.StateT s' m)
   where
-    stateN = retag . fmap (lift .) $ (stateN :: Tagged n ((s -> (a, s)) -> m a))
+    stateN _ = lift . stateN (Proxy :: Proxy n)
 
 -- | The @'MonadState' s m@ constraint asserts that @m@ is a monad stack
 -- that supports state operations on type @s@
@@ -31,7 +31,7 @@ type MonadState s m = MonadStateN (Find (Trans.StateT s) m) s m
 
 -- | Construct a state monad computation from a function
 state :: forall s m a. (MonadState s m) => (s -> (a, s)) -> m a
-state = untag (stateN :: Tagged (Find (Trans.StateT s) m) ((s -> (a, s)) -> m a))
+state = stateN (Proxy :: Proxy (Find (Trans.StateT s) m))
 
 -- | @'put' s@ sets the state within the monad to @s@
 put :: MonadState s m => s -> m ()
