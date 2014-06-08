@@ -20,6 +20,7 @@ cabal-version:       >=1.10
 library
   exposed-modules:
     Control.Monad.Better
+    Control.Monad.Better.Run
   other-modules:
     Control.Monad.Better.State,
     Control.Monad.Better.Core
