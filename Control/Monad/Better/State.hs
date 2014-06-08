@@ -3,6 +3,8 @@ module Control.Monad.Better.State
   , get
   , put
   , state
+  , modify
+  , modify'
   , MonadStateN(..)
   )
   where
@@ -37,3 +39,13 @@ put s = state $ \_ -> ((), s)
 -- | Fetch the current value of the state within the monad
 get :: MonadState a m => m a
 get = state $ \s -> (s, s)
+
+
+-- | Maps an old state to a new state inside a state monad layer
+modify :: MonadState s m => (s -> s) -> m ()
+modify f = state (\s -> ((), f s))
+
+-- | A variant of 'modify' in which the computation is strict in the
+-- new state
+modify' :: MonadState s m => (s -> s) -> m ()
+modify' f = state (\s -> let s' = f s in s' `seq` ((), s'))

@@ -3,6 +3,8 @@ module Control.Monad.Better
     MonadState
   , get
   , put
+  , modify
+  , modify'
     -- * Core classes
   , MonadStateN(..)
   , Nat(..)
