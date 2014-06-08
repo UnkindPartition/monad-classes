@@ -17,8 +17,8 @@ instance Monad m => MonadStateN Zero s (StateT s m) where
 instance (MonadStateN n s m, Monad m)
   => MonadStateN (Suc n) s (StateT s' m)
   where
-    getN = Tagged . lift . untag $ (getN :: Tagged n (m s))
-    putN = Tagged . (lift .) . untag $ (putN :: Tagged n (s -> m ()))
+    getN = retag . fmap lift $ (getN :: Tagged n (m s))
+    putN = retag . fmap (lift .) $ (putN :: Tagged n (s -> m ()))
 
 type MonadState s m = MonadStateN (Find (StateT s) m) s m
 
