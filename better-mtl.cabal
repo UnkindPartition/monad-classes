@@ -19,9 +19,10 @@ cabal-version:       >=1.10
 
 library
   exposed-modules:
+    Control.Monad.Better
+  other-modules:
     Control.Monad.Better.State,
     Control.Monad.Better.Core
-  -- other-modules:       
   build-depends:
     base >=4.7,
     transformers >=0.4,
