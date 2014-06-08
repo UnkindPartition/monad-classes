@@ -2,7 +2,6 @@ module Control.Monad.Better.State where
 import Control.Monad.Trans.State hiding (get, put)
 import qualified Control.Monad.Trans.State as Trans
 import Control.Monad.Trans.Class
-import Control.Applicative
 import Data.Tagged
 import Control.Monad.Better.Core
 

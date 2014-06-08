@@ -38,3 +38,4 @@ library
     PolyKinds,
     ConstraintKinds,
     MultiParamTypeClasses
+  ghc-options: -Wall
