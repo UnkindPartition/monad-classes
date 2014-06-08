@@ -8,12 +8,14 @@ module Control.Monad.MC
   , gets
     -- * Reader
   , MonadReader
+  , MonadLocal
   , ask
   , local
   , reader
     -- * Core classes
   , MonadStateN(..)
   , MonadReaderN(..)
+  , MonadLocalN(..)
   , Nat(..)
   , Find
   ) where
