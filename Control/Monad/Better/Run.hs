@@ -8,6 +8,8 @@
 module Control.Monad.Better.Run
   ( -- * Identity
     run
+    -- * Reader
+  , runReader
     -- * State
   , runStateLazy
   , runStateStrict
@@ -20,9 +22,13 @@ module Control.Monad.Better.Run
 import Data.Functor.Identity
 import Control.Monad.Trans.State.Lazy as SL
 import Control.Monad.Trans.State.Strict as SS
+import qualified Control.Monad.Trans.Reader as R
 
 run :: Identity a -> a
 run = runIdentity
+
+runReader :: r -> R.ReaderT r m a -> m a
+runReader = flip R.runReaderT
 
 runStateLazy   :: s -> SL.StateT s m a -> m (a, s)
 runStateLazy   =  flip SL.runStateT
