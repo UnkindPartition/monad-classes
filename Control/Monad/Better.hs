@@ -6,11 +6,18 @@ module Control.Monad.Better
   , modify
   , modify'
   , gets
+    -- * Reader
+  , MonadReader
+  , ask
+  , local
+  , reader
     -- * Core classes
   , MonadStateN(..)
+  , MonadReaderN(..)
   , Nat(..)
   , Find
   ) where
 
 import Control.Monad.Better.Core
 import Control.Monad.Better.State
+import Control.Monad.Better.Reader
