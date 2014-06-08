@@ -40,7 +40,7 @@ instance (MonadTrans t, Monad (t m), MFunctor t, MonadLocalN n r m, Monad m)
 -- that supports a fixed environment of type @r@
 type MonadReader r m = MonadReaderN (Find (Trans.ReaderT r) m) r m
 
--- | The @'MonadLocal r m@ constraint asserts that @m@ is a monad stack
+-- | The @'MonadLocal' r m@ constraint asserts that @m@ is a monad stack
 -- that supports a fixed environment of type @r@ that can be changed
 -- externally to the monad
 type MonadLocal r m = MonadLocalN (Find (Trans.ReaderT r) m) r m
