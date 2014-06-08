@@ -20,8 +20,8 @@ class Monad m => MonadStateN (n :: Nat) s m where
 instance Monad m => MonadStateN Zero s (Trans.StateT s m) where
   stateN _ = Trans.state
 
-instance (MonadStateN n s m, Monad m)
-  => MonadStateN (Suc n) s (Trans.StateT s' m)
+instance (Monad (t m), MonadTrans t, MonadStateN n s m, Monad m)
+  => MonadStateN (Suc n) s (t m)
   where
     stateN _ = lift . stateN (Proxy :: Proxy n)
 

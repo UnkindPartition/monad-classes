@@ -7,7 +7,7 @@ module Control.Monad.Better.Reader
   )
   where
 import qualified Control.Monad.Trans.Reader as Trans
-import Control.Monad.Morph (hoist)
+import Control.Monad.Morph (MFunctor, hoist)
 import Control.Monad.Trans.Class
 import Data.Proxy
 import Data.Tagged
@@ -23,8 +23,8 @@ instance Monad m => MonadReaderN Zero r (Trans.ReaderT r m) where
   localN _ = Trans.local
   readerN _ = Trans.reader
 
-instance (MonadReaderN n r m, Monad m)
-  => MonadReaderN (Suc n) r (Trans.ReaderT sr' m)
+instance (MonadTrans t, Monad (t m), MFunctor t, MonadReaderN n r m, Monad m)
+  => MonadReaderN (Suc n) r (t m)
   where
     askN = retag $ fmap lift $ (askN :: Tagged n (m r))
     localN _ = \f -> hoist (localN (Proxy :: Proxy n) f)
