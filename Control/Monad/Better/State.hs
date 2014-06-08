@@ -2,33 +2,38 @@ module Control.Monad.Better.State
   ( MonadState
   , get
   , put
+  , state
   , MonadStateN(..)
   )
   where
-import Control.Monad.Trans.State hiding (get, put)
 import qualified Control.Monad.Trans.State as Trans
 import Control.Monad.Trans.Class
 import Data.Tagged
 import Control.Monad.Better.Core
 
 class Monad m => MonadStateN (n :: Nat) s m where
-  getN :: Tagged n (m s)
-  putN :: Tagged n (s -> m ())
+  stateN :: Tagged n ((s -> (a, s)) -> m a)
 
-instance Monad m => MonadStateN Zero s (StateT s m) where
-  getN = Tagged Trans.get
-  putN = Tagged Trans.put
+instance Monad m => MonadStateN Zero s (Trans.StateT s m) where
+  stateN = Tagged Trans.state
 
 instance (MonadStateN n s m, Monad m)
-  => MonadStateN (Suc n) s (StateT s' m)
+  => MonadStateN (Suc n) s (Trans.StateT s' m)
   where
-    getN = retag . fmap lift $ (getN :: Tagged n (m s))
-    putN = retag . fmap (lift .) $ (putN :: Tagged n (s -> m ()))
+    stateN = retag . fmap (lift .) $ (stateN :: Tagged n ((s -> (a, s)) -> m a))
 
-type MonadState s m = MonadStateN (Find (StateT s) m) s m
+-- | The @'MonadState' s m@ constraint asserts that @m@ is a monad stack
+-- that supports state operations on type @s@
+type MonadState s m = MonadStateN (Find (Trans.StateT s) m) s m
 
-get :: forall s m. (MonadState s m) => m s
-get = untag (getN :: Tagged (Find (StateT s) m) (m s))
+-- | Construct a state monad computation from a function
+state :: forall s m a. (MonadState s m) => (s -> (a, s)) -> m a
+state = untag (stateN :: Tagged (Find (Trans.StateT s) m) ((s -> (a, s)) -> m a))
 
-put :: forall s m . (MonadState s m) => s -> m ()
-put = untag (putN :: Tagged (Find (StateT s) m) (s -> m ()))
+-- | @'put' s@ sets the state within the monad to @s@
+put :: MonadState s m => s -> m ()
+put s = state $ \_ -> ((), s)
+
+-- | Fetch the current value of the state within the monad
+get :: MonadState a m => m a
+get = state $ \s -> (s, s)
