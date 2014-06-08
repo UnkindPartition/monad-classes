@@ -5,6 +5,7 @@ module Control.Monad.Better.State
   , state
   , modify
   , modify'
+  , gets
   , MonadStateN(..)
   )
   where
@@ -40,6 +41,12 @@ put s = state $ \_ -> ((), s)
 get :: MonadState a m => m a
 get = state $ \s -> (s, s)
 
+-- | Gets specific component of the state, using a projection function
+-- supplied.
+gets :: MonadState s m => (s -> a) -> m a
+gets f = do
+    s <- get
+    return (f s)
 
 -- | Maps an old state to a new state inside a state monad layer
 modify :: MonadState s m => (s -> s) -> m ()
