@@ -1,4 +1,4 @@
-module Control.Monad.Better.Core where
+module Control.Monad.MC.Core where
 
 data Nat = Zero | Suc Nat
 

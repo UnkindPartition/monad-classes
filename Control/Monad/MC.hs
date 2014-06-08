@@ -1,4 +1,4 @@
-module Control.Monad.Better
+module Control.Monad.MC
   ( -- * State
     MonadState
   , get
@@ -18,6 +18,6 @@ module Control.Monad.Better
   , Find
   ) where
 
-import Control.Monad.Better.Core
-import Control.Monad.Better.State
-import Control.Monad.Better.Reader
+import Control.Monad.MC.Core
+import Control.Monad.MC.State
+import Control.Monad.MC.Reader

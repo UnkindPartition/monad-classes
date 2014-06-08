@@ -1,4 +1,4 @@
-module Control.Monad.Better.Reader
+module Control.Monad.MC.Reader
   ( MonadReader
   , ask
   , local
@@ -11,7 +11,7 @@ import Control.Monad.Morph (MFunctor, hoist)
 import Control.Monad.Trans.Class
 import Data.Proxy
 import Data.Tagged
-import Control.Monad.Better.Core
+import Control.Monad.MC.Core
 
 class Monad m => MonadReaderN (n :: Nat) r m where
   askN :: Tagged n (m r)

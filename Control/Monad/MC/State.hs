@@ -1,4 +1,4 @@
-module Control.Monad.Better.State
+module Control.Monad.MC.State
   ( MonadState
   , get
   , put
@@ -12,7 +12,7 @@ module Control.Monad.Better.State
 import qualified Control.Monad.Trans.State as Trans
 import Control.Monad.Trans.Class
 import Data.Proxy
-import Control.Monad.Better.Core
+import Control.Monad.MC.Core
 
 class Monad m => MonadStateN (n :: Nat) s m where
   stateN :: Proxy n -> ((s -> (a, s)) -> m a)
