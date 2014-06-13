@@ -1,4 +1,4 @@
-module Control.Monad.MC.State
+module Control.Monad.Classes.State
   ( MonadState
   , get
   , put
@@ -14,7 +14,7 @@ import qualified Control.Monad.Trans.State.Lazy as SL
 import qualified Control.Monad.Trans.State.Strict as SS
 import Control.Monad.Trans.Class
 import Data.Proxy
-import Control.Monad.MC.Core
+import Control.Monad.Classes.Core
 
 data EffState s -- effect
 

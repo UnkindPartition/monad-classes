@@ -5,7 +5,7 @@
 --
 -- Note that reader and state runners have their arguments swapped around;
 -- this makes it convenient to chain them.
-module Control.Monad.MC.Run
+module Control.Monad.Classes.Run
   ( -- * Identity
     run
     -- * Reader

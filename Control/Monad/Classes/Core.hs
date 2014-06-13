@@ -1,5 +1,5 @@
 {-# LANGUAGE UndecidableInstances #-}
-module Control.Monad.MC.Core where
+module Control.Monad.Classes.Core where
 
 data Nat = Zero | Suc Nat
 

@@ -1,4 +1,4 @@
-module Control.Monad.MC
+module Control.Monad.Classes
   ( -- * State
     MonadState
   , get
@@ -20,6 +20,6 @@ module Control.Monad.MC
   , Find
   ) where
 
-import Control.Monad.MC.Core
-import Control.Monad.MC.State
-import Control.Monad.MC.Reader
+import Control.Monad.Classes.Core
+import Control.Monad.Classes.State
+import Control.Monad.Classes.Reader

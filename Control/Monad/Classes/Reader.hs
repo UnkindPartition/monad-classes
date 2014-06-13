@@ -1,4 +1,4 @@
-module Control.Monad.MC.Reader
+module Control.Monad.Classes.Reader
   ( MonadReader
   , MonadLocal
   , ask
@@ -6,13 +6,15 @@ module Control.Monad.MC.Reader
   , reader
   , MonadReaderN(..)
   , MonadLocalN(..)
+  , EffReader
+  , EffLocal
   )
   where
 import qualified Control.Monad.Trans.Reader as Trans
 import Control.Monad.Morph (MFunctor, hoist)
 import Control.Monad.Trans.Class
 import Data.Proxy
-import Control.Monad.MC.Core
+import Control.Monad.Classes.Core
 
 data EffReader e
 data EffLocal e

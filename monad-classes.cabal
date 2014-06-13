@@ -16,12 +16,12 @@ cabal-version:       >=1.10
 
 library
   exposed-modules:
-    Control.Monad.MC
-    Control.Monad.MC.Run
+    Control.Monad.Classes
+    Control.Monad.Classes.Run
   other-modules:
-    Control.Monad.MC.State,
-    Control.Monad.MC.Core,
-    Control.Monad.MC.Reader
+    Control.Monad.Classes.State,
+    Control.Monad.Classes.Core,
+    Control.Monad.Classes.Reader
   build-depends:
     base >=4.7,
     mmorph >= 1.0.3,
