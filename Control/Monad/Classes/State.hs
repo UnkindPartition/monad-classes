@@ -13,7 +13,7 @@ module Control.Monad.Classes.State
 import qualified Control.Monad.Trans.State.Lazy as SL
 import qualified Control.Monad.Trans.State.Strict as SS
 import Control.Monad.Trans.Class
-import Data.Proxy
+import GHC.Prim (Proxy#, proxy#)
 import Control.Monad.Classes.Core
 
 data EffState s -- effect
@@ -26,7 +26,7 @@ type family StateCanDo s eff where
   StateCanDo s eff = False
 
 class Monad m => MonadStateN (n :: Nat) s m where
-  stateN :: Proxy n -> ((s -> (a, s)) -> m a)
+  stateN :: Proxy# n -> ((s -> (a, s)) -> m a)
 
 instance Monad m => MonadStateN Zero s (SL.StateT s m) where
   stateN _ = SL.state
@@ -37,7 +37,7 @@ instance Monad m => MonadStateN Zero s (SS.StateT s m) where
 instance (Monad (t m), MonadTrans t, MonadStateN n s m, Monad m)
   => MonadStateN (Suc n) s (t m)
   where
-    stateN _ = lift . stateN (Proxy :: Proxy n)
+    stateN _ = lift . stateN (proxy# :: Proxy# n)
 
 -- | The @'MonadState' s m@ constraint asserts that @m@ is a monad stack
 -- that supports state operations on type @s@
@@ -45,7 +45,7 @@ type MonadState s m = MonadStateN (Find (EffState s) m) s m
 
 -- | Construct a state monad computation from a function
 state :: forall s m a. (MonadState s m) => (s -> (a, s)) -> m a
-state = stateN (Proxy :: Proxy (Find (EffState s) m))
+state = stateN (proxy# :: Proxy# (Find (EffState s) m))
 
 -- | @'put' s@ sets the state within the monad to @s@
 put :: MonadState s m => s -> m ()

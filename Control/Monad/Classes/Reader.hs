@@ -13,7 +13,7 @@ module Control.Monad.Classes.Reader
 import qualified Control.Monad.Trans.Reader as Trans
 import Control.Monad.Morph (MFunctor, hoist)
 import Control.Monad.Trans.Class
-import Data.Proxy
+import GHC.Prim (Proxy#, proxy#)
 import Control.Monad.Classes.Core
 
 data EffReader e
@@ -27,7 +27,7 @@ type family ReaderCanDo e eff where
   ReaderCanDo e eff = False
 
 class Monad m => MonadReaderN (n :: Nat) r m where
-  readerN :: Proxy n -> ((r -> a) -> m a)
+  readerN :: Proxy# n -> ((r -> a) -> m a)
 
 instance Monad m => MonadReaderN Zero r (Trans.ReaderT r m) where
   readerN _ = Trans.reader
@@ -35,10 +35,10 @@ instance Monad m => MonadReaderN Zero r (Trans.ReaderT r m) where
 instance (MonadTrans t, Monad (t m), MonadReaderN n r m, Monad m)
   => MonadReaderN (Suc n) r (t m)
   where
-    readerN _ = lift . readerN (Proxy :: Proxy n)
+    readerN _ = lift . readerN (proxy# :: Proxy# n)
 
 class Monad m => MonadLocalN (n :: Nat) r m where
-  localN :: Proxy n -> ((r -> r) -> m a -> m a)
+  localN :: Proxy# n -> ((r -> r) -> m a -> m a)
 
 instance Monad m => MonadLocalN Zero r (Trans.ReaderT r m) where
   localN _ = Trans.local
@@ -46,7 +46,7 @@ instance Monad m => MonadLocalN Zero r (Trans.ReaderT r m) where
 instance (MonadTrans t, Monad (t m), MFunctor t, MonadLocalN n r m, Monad m)
   => MonadLocalN (Suc n) r (t m)
   where
-    localN _ = \f -> hoist (localN (Proxy :: Proxy n) f)
+    localN _ = \f -> hoist (localN (proxy# :: Proxy# n) f)
 
 -- | The @'MonadReader' r m@ constraint asserts that @m@ is a monad stack
 -- that supports a fixed environment of type @r@
@@ -66,10 +66,10 @@ local :: forall a m r. MonadLocal r m
       => (r -> r)  -- ^ The function to modify the environment.
       -> m a       -- ^ @Reader@ to run in the modified environment.
       -> m a
-local = localN (Proxy :: Proxy (Find (EffLocal r) m))
+local = localN (proxy# :: Proxy# (Find (EffLocal r) m))
 
 -- | Retrieves a function of the current environment.
 reader :: forall a r m . MonadReader r m
        => (r -> a)  -- ^ The selector function to apply to the environment.
        -> m a
-reader = readerN (Proxy :: Proxy (Find (EffReader r) m))
+reader = readerN (proxy# :: Proxy# (Find (EffReader r) m))
