@@ -12,12 +12,21 @@ module Control.Monad.Classes
   , ask
   , local
   , reader
-    -- * Core classes
+    -- * Core classes and types
+    -- ** Effects
+  , EffState
+  , EffReader
+  , EffLocal
+    -- ** N-classes
   , MonadStateN(..)
   , MonadReaderN(..)
   , MonadLocalN(..)
+    -- ** Type families
   , Nat(..)
-  , Find
+  , Find(..)
+  , FindTrue(..)
+  , MapCanDo(..)
+  , CanDo(..)
   ) where
 
 import Control.Monad.Classes.Core
