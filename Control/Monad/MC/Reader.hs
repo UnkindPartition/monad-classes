@@ -14,6 +14,16 @@ import Control.Monad.Trans.Class
 import Data.Proxy
 import Control.Monad.MC.Core
 
+data EffReader e
+data EffLocal e
+
+type instance CanDo (Trans.ReaderT e m) eff = ReaderCanDo e eff
+
+type family ReaderCanDo e eff where
+  ReaderCanDo e (EffReader e) = True
+  ReaderCanDo e (EffLocal e) = True
+  ReaderCanDo e eff = False
+
 class Monad m => MonadReaderN (n :: Nat) r m where
   readerN :: Proxy n -> ((r -> a) -> m a)
 
@@ -38,12 +48,12 @@ instance (MonadTrans t, Monad (t m), MFunctor t, MonadLocalN n r m, Monad m)
 
 -- | The @'MonadReader' r m@ constraint asserts that @m@ is a monad stack
 -- that supports a fixed environment of type @r@
-type MonadReader r m = MonadReaderN (Find (Trans.ReaderT r) m) r m
+type MonadReader e m = MonadReaderN (Find (EffReader e) m) e m
 
 -- | The @'MonadLocal' r m@ constraint asserts that @m@ is a monad stack
 -- that supports a fixed environment of type @r@ that can be changed
 -- externally to the monad
-type MonadLocal r m = MonadLocalN (Find (Trans.ReaderT r) m) r m
+type MonadLocal e m = MonadLocalN (Find (EffLocal e) m) e m
 
 -- | Fetch the environment passed through the reader monad
 ask :: MonadReader r m => m r
@@ -54,10 +64,10 @@ local :: forall a m r. MonadLocal r m
       => (r -> r)  -- ^ The function to modify the environment.
       -> m a       -- ^ @Reader@ to run in the modified environment.
       -> m a
-local = localN (Proxy :: Proxy (Find (Trans.ReaderT r) m))
+local = localN (Proxy :: Proxy (Find (EffLocal r) m))
 
 -- | Retrieves a function of the current environment.
 reader :: forall a r m . MonadReader r m
        => (r -> a)  -- ^ The selector function to apply to the environment.
        -> m a
-reader = readerN (Proxy :: Proxy (Find (Trans.ReaderT r) m))
+reader = readerN (Proxy :: Proxy (Find (EffReader r) m))
