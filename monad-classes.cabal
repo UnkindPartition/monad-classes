@@ -42,3 +42,19 @@ library
     TypeOperators,
     UndecidableInstances
   ghc-options: -Wall
+
+Test-suite test
+  Default-language:
+    Haskell2010
+  Type:
+    exitcode-stdio-1.0
+  Hs-source-dirs:
+    tests
+  Main-is:
+    test.hs
+  Build-depends:
+      base >= 4 && < 5
+    , tasty >= 0.8
+    , tasty-hunit
+    , monad-classes
+    , transformers
