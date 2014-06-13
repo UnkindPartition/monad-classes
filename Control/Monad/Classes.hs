@@ -23,10 +23,10 @@ module Control.Monad.Classes
   , MonadLocalN(..)
     -- ** Type families
   , Nat(..)
-  , Find(..)
-  , FindTrue(..)
-  , MapCanDo(..)
-  , CanDo(..)
+  , Find
+  , FindTrue
+  , MapCanDo
+  , CanDo
   ) where
 
 import Control.Monad.Classes.Core
