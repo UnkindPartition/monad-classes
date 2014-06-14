@@ -65,6 +65,10 @@ instance (Monad m, MonadState r m)
   => MonadLocalN Zero r (SL.StateT r m) where
   localN _ = stateLocal
 
+instance (Monad m, MonadState r m)
+  => MonadLocalN Zero r (SS.StateT r m) where
+  localN _ = stateLocal
+
 instance (MonadTrans t, Monad (t m), MFunctor t, MonadLocalN n r m, Monad m)
   => MonadLocalN (Suc n) r (t m)
   where
