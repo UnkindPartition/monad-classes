@@ -15,6 +15,8 @@ import qualified Control.Monad.Trans.State.Strict as SS
 import Control.Monad.Trans.Class
 import GHC.Prim (Proxy#, proxy#)
 import Control.Monad.Classes.Core
+import {-# SOURCE #-} Control.Monad.Classes.Reader
+  (EffReader, EffLocal)
 
 data EffState s -- effect
 
@@ -23,6 +25,8 @@ type instance CanDo (SL.StateT s m) eff = StateCanDo s eff
 
 type family StateCanDo s eff where
   StateCanDo s (EffState s) = True
+  StateCanDo s (EffReader s) = True
+  StateCanDo s (EffLocal s) = True
   StateCanDo s eff = False
 
 class Monad m => MonadStateN (n :: Nat) s m where

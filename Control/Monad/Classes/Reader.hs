@@ -10,16 +10,20 @@ module Control.Monad.Classes.Reader
   , EffLocal
   )
   where
-import qualified Control.Monad.Trans.Reader as Trans
+import Control.Monad
+import qualified Control.Monad.Trans.Reader as R
+import qualified Control.Monad.Trans.State.Lazy as SL
+import qualified Control.Monad.Trans.State.Strict as SS
 import Control.Monad.Morph (MFunctor, hoist)
 import Control.Monad.Trans.Class
 import GHC.Prim (Proxy#, proxy#)
 import Control.Monad.Classes.Core
+import Control.Monad.Classes.State
 
 data EffReader e
 data EffLocal e
 
-type instance CanDo (Trans.ReaderT e m) eff = ReaderCanDo e eff
+type instance CanDo (R.ReaderT e m) eff = ReaderCanDo e eff
 
 type family ReaderCanDo e eff where
   ReaderCanDo e (EffReader e) = True
@@ -29,8 +33,14 @@ type family ReaderCanDo e eff where
 class Monad m => MonadReaderN (n :: Nat) r m where
   readerN :: Proxy# n -> ((r -> a) -> m a)
 
-instance Monad m => MonadReaderN Zero r (Trans.ReaderT r m) where
-  readerN _ = Trans.reader
+instance Monad m => MonadReaderN Zero r (R.ReaderT r m) where
+  readerN _ = R.reader
+
+instance Monad m => MonadReaderN Zero r (SL.StateT r m) where
+  readerN _ = \k -> k `liftM` SL.get
+
+instance Monad m => MonadReaderN Zero r (SS.StateT r m) where
+  readerN _ = \k -> k `liftM` SS.get
 
 instance (MonadTrans t, Monad (t m), MonadReaderN n r m, Monad m)
   => MonadReaderN (Suc n) r (t m)
@@ -40,8 +50,20 @@ instance (MonadTrans t, Monad (t m), MonadReaderN n r m, Monad m)
 class Monad m => MonadLocalN (n :: Nat) r m where
   localN :: Proxy# n -> ((r -> r) -> m a -> m a)
 
-instance Monad m => MonadLocalN Zero r (Trans.ReaderT r m) where
-  localN _ = Trans.local
+instance Monad m => MonadLocalN Zero r (R.ReaderT r m) where
+  localN _ = R.local
+
+stateLocal :: MonadState s m => (s -> s) -> m a -> m a
+stateLocal f a = do
+  s <- get
+  put (f s)
+  r <- a
+  put s
+  return r
+
+instance (Monad m, MonadState r m)
+  => MonadLocalN Zero r (SL.StateT r m) where
+  localN _ = stateLocal
 
 instance (MonadTrans t, Monad (t m), MFunctor t, MonadLocalN n r m, Monad m)
   => MonadLocalN (Suc n) r (t m)
