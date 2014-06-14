@@ -61,12 +61,10 @@ stateLocal f a = do
   put s
   return r
 
-instance (Monad m, MonadState r m)
-  => MonadLocalN Zero r (SL.StateT r m) where
+instance (Monad m) => MonadLocalN Zero r (SL.StateT r m) where
   localN _ = stateLocal
 
-instance (Monad m, MonadState r m)
-  => MonadLocalN Zero r (SS.StateT r m) where
+instance (Monad m) => MonadLocalN Zero r (SS.StateT r m) where
   localN _ = stateLocal
 
 instance (MonadTrans t, Monad (t m), MFunctor t, MonadLocalN n r m, Monad m)
