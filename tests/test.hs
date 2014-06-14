@@ -14,6 +14,7 @@ tests = testGroup "Tests"
   [ simpleStateTests
   , twoStatesTests
   , liftingTest
+  , localState
   ]
 
 simpleStateTests = testGroup "Simple State"
@@ -38,3 +39,15 @@ type instance CanDo (Foo m) eff = False
 
 liftingTest = testCase "Lifting through an unknown transformer" $
   (run $ runStateLazy 'a' $ runFoo $ runStateLazy False twoStatesComp) @?= (((), True), 'c')
+
+localState = testCase "MonadLocal StateT" $
+  (run $ evalStateStrict 'a' $
+    do
+      s1 <- get
+      (s2,s3) <- local (toEnum . (+1) . fromEnum :: Char -> Char) $ do
+        s2 <- get
+        put 'x'
+        s3 <- get
+        return (s2,s3)
+      s4 <- get
+      return [s1,s2,s3,s4]) @?= "abxa"
