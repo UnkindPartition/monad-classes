@@ -18,11 +18,13 @@ module Control.Monad.Classes
   , EffReader
   , EffLocal
     -- ** N-classes
+  , Nat(..)
   , MonadStateN(..)
   , MonadReaderN(..)
   , MonadLocalN(..)
     -- ** Type families
-  , Nat(..)
+    -- | You should rarely need these. They are exported mostly for
+    -- documentation and pedagogical purposes.
   , Find
   , FindTrue
   , MapCanDo
