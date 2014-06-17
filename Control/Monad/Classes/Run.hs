@@ -17,9 +17,13 @@ module Control.Monad.Classes.Run
   , evalStateStrict
   , execStateLazy
   , execStateStrict
+  , runWriterStrict
+  , evalWriterStrict
+  , execWriterStrict
   ) where
 
 import Data.Functor.Identity
+import Data.Monoid
 import Control.Monad.Trans.State.Lazy as SL
 import Control.Monad.Trans.State.Strict as SS
 import qualified Control.Monad.Trans.Reader as R
@@ -44,3 +48,12 @@ execStateLazy   :: Monad m => s -> SL.StateT s m a -> m s
 execStateLazy   = flip SL.execStateT
 execStateStrict :: Monad m => s -> SS.StateT s m a -> m s
 execStateStrict = flip SS.execStateT
+
+runWriterStrict :: (Monad m, Monoid w) => SS.StateT w m a -> m (a, w)
+runWriterStrict = runStateStrict mempty
+
+evalWriterStrict :: (Monad m, Monoid w) => SS.StateT w m a -> m a
+evalWriterStrict = evalStateStrict mempty
+
+execWriterStrict :: (Monad m, Monoid w) => SS.StateT w m a -> m w
+execWriterStrict = execStateStrict mempty
