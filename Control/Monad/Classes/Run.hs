@@ -17,9 +17,12 @@ module Control.Monad.Classes.Run
   , evalStateStrict
   , execStateLazy
   , execStateStrict
+    -- * Writer
   , runWriterStrict
   , evalWriterStrict
   , execWriterStrict
+    -- * Except
+  , runExcept
   ) where
 
 import Data.Functor.Identity
@@ -27,6 +30,7 @@ import Data.Monoid
 import Control.Monad.Trans.State.Lazy as SL
 import Control.Monad.Trans.State.Strict as SS
 import qualified Control.Monad.Trans.Reader as R
+import qualified Control.Monad.Trans.Except as Exc
 
 run :: Identity a -> a
 run = runIdentity
@@ -57,3 +61,6 @@ evalWriterStrict = evalStateStrict mempty
 
 execWriterStrict :: (Monad m, Monoid w) => SS.StateT w m a -> m w
 execWriterStrict = execStateStrict mempty
+
+runExcept :: Exc.ExceptT e m a -> m (Either e a)
+runExcept = Exc.runExceptT
