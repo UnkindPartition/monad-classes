@@ -28,7 +28,8 @@ library
   build-depends:
     base >=4.7,
     mmorph >= 1.0.3,
-    transformers >=0.4,
+    transformers >=0.2,
+    transformers-compat >= 0.3.1,
     ghc-prim
   -- hs-source-dirs:
   default-language:    Haskell2010
