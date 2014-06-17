@@ -6,6 +6,7 @@ import Control.Monad.Trans.Class
 import Control.Monad.Classes
 import Control.Monad.Classes.Run
 import Control.Applicative
+import Control.Exception hiding (throw)
 
 main = defaultMain tests
 
@@ -15,6 +16,7 @@ tests = testGroup "Tests"
   , twoStatesTests
   , liftingTest
   , localState
+  , exceptTests
   ]
 
 simpleStateTests = testGroup "Simple State"
@@ -51,3 +53,12 @@ localState = testCase "MonadLocal StateT" $
         return (s2,s3)
       s4 <- get
       return [s1,s2,s3,s4]) @?= "abxa"
+
+exceptTests = testGroup "Except"
+  [ testCase "Catch before IO" $ do
+      r <- runExcept $ runStateStrict False $ throw $ ErrorCall "foo"
+      r @?= Left (ErrorCall "foo")
+  , testCase "Let escape to IO" $ do
+      r <- try $ runExcept $ runStateStrict False $ throw UserInterrupt
+      (r :: Either AsyncException (Either ErrorCall ((), Bool))) @?= Left UserInterrupt
+  ]
