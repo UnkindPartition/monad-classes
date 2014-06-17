@@ -1,5 +1,5 @@
 name:                monad-classes
-version:             1.0
+version:             0.1
 synopsis:            more flexible mtl
 -- description:
 homepage:            https://github.com/feuerbach/monad-classes
