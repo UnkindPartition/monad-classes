@@ -41,7 +41,7 @@ instance (MonadTrans t, Monad (t m), MonadWriterN n w m, Monad m)
     tellN _ = lift . tellN (proxy# :: Proxy# n)
 
 -- | The @'MonadWriter' w m@ constraint asserts that @m@ is a monad stack
--- that supports a fixed environment of type @w@
+-- that supports outputting values of type @w@
 type MonadWriter w m = MonadWriterN (Find (EffWriter w) m) w m
 
 -- | @'tell' w@ is an action that produces the output @w@
