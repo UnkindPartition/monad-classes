@@ -33,7 +33,10 @@ instance (Monad m, Monoid w) => MonadWriterN Zero w (SL.StateT w m) where
   tellN _ w = SL.modify (<> w)
 
 instance (Monad m, Monoid w) => MonadWriterN Zero w (SS.StateT w m) where
-  tellN _ w = SS.modify' (<> w)
+  tellN _ w = modify' (<> w)
+    where
+      modify' :: (s -> s) -> SS.StateT s m ()
+      modify' f = SS.state (\s -> let s' = f s in s' `seq` ((), s'))
 
 instance (MonadTrans t, Monad (t m), MonadWriterN n w m, Monad m)
   => MonadWriterN (Suc n) w (t m)
