@@ -21,8 +21,9 @@ library
   other-modules:
     Control.Monad.Classes.State,
     Control.Monad.Classes.Writer,
-    Control.Monad.Classes.Core,
-    Control.Monad.Classes.Reader
+    Control.Monad.Classes.Reader,
+    Control.Monad.Classes.Except,
+    Control.Monad.Classes.Core
   build-depends:
     base >=4.7,
     mmorph >= 1.0.3,
