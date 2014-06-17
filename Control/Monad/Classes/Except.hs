@@ -10,7 +10,6 @@ import qualified Control.Exception as E
 import Control.Monad.Trans.Class
 import GHC.Prim (Proxy#, proxy#)
 import Control.Monad.Classes.Core
-import Data.Monoid
 
 -- | Except effect
 data EffExcept e
@@ -26,7 +25,7 @@ type family ExceptCanDo e eff where
 class Monad m => MonadExceptN (n :: Nat) e m where
   throwN :: Proxy# n -> (e -> m a)
 
-instance (Monad m, Monoid e) => MonadExceptN Zero e (Exc.ExceptT e m) where
+instance (Monad m) => MonadExceptN Zero e (Exc.ExceptT e m) where
   throwN _ = Exc.throwE
 
 instance (E.Exception e) => MonadExceptN Zero e IO where
