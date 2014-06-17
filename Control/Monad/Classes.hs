@@ -12,16 +12,21 @@ module Control.Monad.Classes
   , ask
   , local
   , reader
+    -- * Writer
+  , MonadWriter
+  , tell
     -- * Core classes and types
     -- ** Effects
   , EffState
   , EffReader
   , EffLocal
+  , EffWriter
     -- ** N-classes
   , Nat(..)
   , MonadStateN(..)
   , MonadReaderN(..)
   , MonadLocalN(..)
+  , MonadWriterN(..)
     -- ** Type families
     -- | You should rarely need these. They are exported mostly for
     -- documentation and pedagogical purposes.
@@ -34,3 +39,4 @@ module Control.Monad.Classes
 import Control.Monad.Classes.Core
 import Control.Monad.Classes.State
 import Control.Monad.Classes.Reader
+import Control.Monad.Classes.Writer

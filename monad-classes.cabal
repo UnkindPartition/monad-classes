@@ -20,6 +20,7 @@ library
     Control.Monad.Classes.Run
   other-modules:
     Control.Monad.Classes.State,
+    Control.Monad.Classes.Writer,
     Control.Monad.Classes.Core,
     Control.Monad.Classes.Reader
   build-depends:
