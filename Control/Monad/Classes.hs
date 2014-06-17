@@ -18,6 +18,9 @@ module Control.Monad.Classes
     -- * Exceptions
   , MonadExcept
   , throw
+    -- * Exec
+  , MonadExec
+  , exec
     -- * Core classes and types
     -- ** Effects
   , EffState
@@ -25,6 +28,7 @@ module Control.Monad.Classes
   , EffLocal
   , EffWriter
   , EffExcept
+  , EffExec
     -- ** N-classes
   , Nat(..)
   , MonadStateN(..)
@@ -32,6 +36,7 @@ module Control.Monad.Classes
   , MonadLocalN(..)
   , MonadWriterN(..)
   , MonadExceptN(..)
+  , MonadExecN(..)
     -- ** Type families
     -- | You should rarely need these. They are exported mostly for
     -- documentation and pedagogical purposes.
@@ -46,3 +51,4 @@ import Control.Monad.Classes.State
 import Control.Monad.Classes.Reader
 import Control.Monad.Classes.Writer
 import Control.Monad.Classes.Except
+import Control.Monad.Classes.Exec
