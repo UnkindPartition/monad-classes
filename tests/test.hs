@@ -8,6 +8,10 @@ import Control.Monad.Classes.Run
 import Control.Applicative
 import Control.Exception hiding (throw)
 
+-- for IO tests
+import qualified Foreign.Storable as Foreign
+import qualified Foreign.Marshal.Alloc as Foreign
+
 main = defaultMain tests
 
 tests :: TestTree
@@ -17,6 +21,7 @@ tests = testGroup "Tests"
   , liftingTest
   , localState
   , exceptTests
+  , execTests
   ]
 
 simpleStateTests = testGroup "Simple State"
@@ -62,3 +67,10 @@ exceptTests = testGroup "Except"
       r <- try $ runExcept $ runStateStrict False $ throw UserInterrupt
       (r :: Either AsyncException (Either ErrorCall ((), Bool))) @?= Left UserInterrupt
   ]
+
+execTests = testCase "Exec" $ do
+  r <- runWriterStrict $ exec $
+    Foreign.alloca $ \ptr -> do
+      Foreign.poke ptr True
+      Foreign.peek ptr
+  r @?= (True, ())
