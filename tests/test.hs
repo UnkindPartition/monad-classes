@@ -62,7 +62,7 @@ localState = testCase "MonadLocal StateT" $
 exceptTests = testGroup "Except"
   [ testCase "Catch before IO" $ do
       r <- runExcept $ runStateStrict False $ throw $ ErrorCall "foo"
-      r @?= Left (ErrorCall "foo")
+      (r :: Either ErrorCall ((), Bool)) @?= Left (ErrorCall "foo")
   , testCase "Let escape to IO" $ do
       r <- try $ runExcept $ runStateStrict False $ throw UserInterrupt
       (r :: Either AsyncException (Either ErrorCall ((), Bool))) @?= Left UserInterrupt
