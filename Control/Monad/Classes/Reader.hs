@@ -1,5 +1,4 @@
 module Control.Monad.Classes.Reader where
-import Control.Monad
 import qualified Control.Monad.Trans.Reader as R
 import qualified Control.Monad.Trans.State.Lazy as SL
 import qualified Control.Monad.Trans.State.Strict as SS
@@ -17,21 +16,21 @@ type family ReaderCanDo e eff where
   ReaderCanDo e eff = False
 
 class Monad m => MonadReaderN (n :: Nat) r m where
-  readerN :: Proxy# n -> ((r -> a) -> m a)
+  askN :: Proxy# n -> m r
 
 instance Monad m => MonadReaderN Zero r (R.ReaderT r m) where
-  readerN _ = R.reader
+  askN _ = R.ask
 
 instance Monad m => MonadReaderN Zero r (SL.StateT r m) where
-  readerN _ = \k -> k `liftM` SL.get
+  askN _ = SL.get
 
 instance Monad m => MonadReaderN Zero r (SS.StateT r m) where
-  readerN _ = \k -> k `liftM` SS.get
+  askN _ = SS.get
 
 instance (MonadTrans t, Monad (t m), MonadReaderN n r m, Monad m)
   => MonadReaderN (Suc n) r (t m)
   where
-    readerN _ = lift . readerN (proxy# :: Proxy# n)
+    askN _ = lift $ askN (proxy# :: Proxy# n)
 
 class Monad m => MonadLocalN (n :: Nat) r m where
   localN :: Proxy# n -> ((r -> r) -> m a -> m a)
@@ -68,8 +67,8 @@ type MonadReader e m = MonadReaderN (Find (EffReader e) m) e m
 type MonadLocal e m = MonadLocalN (Find (EffLocal e) m) e m
 
 -- | Fetch the environment passed through the reader monad
-ask :: MonadReader r m => m r
-ask = reader id
+ask :: forall m r . MonadReader r m => m r
+ask = askN (proxy# :: Proxy# (Find (EffReader r) m))
 
 -- | Executes a computation in a modified environment.
 local :: forall a m r. MonadLocal r m
@@ -77,12 +76,6 @@ local :: forall a m r. MonadLocal r m
       -> m a       -- ^ @Reader@ to run in the modified environment.
       -> m a
 local = localN (proxy# :: Proxy# (Find (EffLocal r) m))
-
--- | Retrieves a function of the current environment.
-reader :: forall a r m . MonadReader r m
-       => (r -> a)  -- ^ The selector function to apply to the environment.
-       -> m a
-reader = readerN (proxy# :: Proxy# (Find (EffReader r) m))
 
 runReader :: r -> R.ReaderT r m a -> m a
 runReader = flip R.runReaderT

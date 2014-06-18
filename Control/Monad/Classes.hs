@@ -11,7 +11,6 @@ module Control.Monad.Classes
   , MonadLocal
   , ask
   , local
-  , reader
     -- * Writer
   , MonadWriter
   , tell
