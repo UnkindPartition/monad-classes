@@ -22,11 +22,13 @@ module Control.Monad.Classes.Run
   , evalWriterStrict
   , execWriterStrict
   , evalWriterWith
+  , CustomWriterT(..)
     -- * Except
   , runExcept
   , runMaybe
     -- * Zoom
   , runZoom
+  , ZoomT(..)
   ) where
 
 import Data.Functor.Identity

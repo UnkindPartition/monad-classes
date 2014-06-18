@@ -8,16 +8,12 @@ import Control.Monad.Classes.Effects
 import Control.Monad.Classes.Reader
 import Control.Monad.Classes.State
 import Control.Monad.Classes.Writer
+import Control.Monad.Classes.Proxied
 import Data.Functor.Identity
 import Data.Monoid
-import Data.Reflection
-import Data.Proxy
 
-newtype ZoomT q big small m a = ZoomT (m a)
-  deriving (Functor, Applicative, Monad, Alternative, MonadPlus)
-
-instance MonadTrans (ZoomT q big small) where
-  lift = ZoomT
+newtype ZoomT big small m a = ZoomT (Proxied (VLLens big small) m a)
+  deriving (Functor, Applicative, Alternative, Monad, MonadPlus, MonadTrans)
 
 newtype VLLens big small = VLLens (forall f . Functor f => (small -> f small) -> big -> f big)
 
@@ -34,14 +30,13 @@ vlMod' (VLLens l) f s = runIdentity (l (\x -> Identity $! f x) s)
 runZoom
   :: forall big small m a .
      (forall f. Functor f => (small -> f small) -> big -> f big)
-  -> (forall (q :: *). Reifies q (VLLens big small) => ZoomT q big small m a)
+  -> ZoomT big small m a
   -> m a
 runZoom l a =
-  reify (VLLens l) $ \(Proxy :: Proxy q) ->
-    case a :: ZoomT q big small m a of
-      ZoomT a' -> a'
+  reify (VLLens l) $ \px ->
+    case a of ZoomT (Proxied f) -> f px
 
-type instance CanDo (ZoomT q big small m) eff = ZoomCanDo small eff
+type instance CanDo (ZoomT big small m) eff = ZoomCanDo small eff
 
 type family ZoomCanDo s eff where
   ZoomCanDo s (EffState s) = True
@@ -49,35 +44,22 @@ type family ZoomCanDo s eff where
   ZoomCanDo s (EffWriter s) = True
   ZoomCanDo s eff = False
 
-instance
-  ( MonadReader big m
-  , Reifies q (VLLens big small)
-  )
-  => MonadReaderN Zero small (ZoomT q big small m)
+instance MonadReader big m => MonadReaderN Zero small (ZoomT big small m)
   where
-  askN _ = ZoomT $ vlGet (reflect (Proxy :: Proxy q)) `liftM` ask
+  askN _ = ZoomT $ Proxied $ \px -> vlGet (reflect px) `liftM` ask
 
-instance
-  ( MonadState big m
-  , Reifies q (VLLens big small)
-  )
-  => MonadStateN Zero small (ZoomT q big small m)
+instance MonadState big m => MonadStateN Zero small (ZoomT big small m)
   where
-  stateN _ f = ZoomT $ state $ \s ->
-    case f (vlGet l s) of
-      (a, t') -> (a, vlSet l t' s)
-    where
-      l = reflect (Proxy :: Proxy q)
+  stateN _ f = ZoomT $ Proxied $ \px ->
+    let l = reflect px in
+    state $ \s ->
+      case f (vlGet l s) of
+        (a, t') -> (a, vlSet l t' s)
 
-instance
-  ( MonadState big m
-  , Reifies q (VLLens big small)
-  , Monoid small
-  )
-  => MonadWriterN Zero small (ZoomT q big small m)
+instance (MonadState big m, Monoid small) => MonadWriterN Zero small (ZoomT big small m)
   where
-  tellN _ w = ZoomT $ state $ \s ->
-    let s' = vlMod' l (<> w) s
-    in s' `seq` ((), s')
-    where
-      l = reflect (Proxy :: Proxy q)
+  tellN _ w = ZoomT $ Proxied $ \px ->
+    let l = reflect px in
+    state $ \s ->
+      let s' = vlMod' l (<> w) s
+      in s' `seq` ((), s')
