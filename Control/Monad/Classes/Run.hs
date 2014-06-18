@@ -21,16 +21,20 @@ module Control.Monad.Classes.Run
   , runWriterStrict
   , evalWriterStrict
   , execWriterStrict
+  , evalWriterWith
     -- * Except
   , runExcept
   ) where
 
 import Data.Functor.Identity
 import Data.Monoid
+import Data.Reflection
+import Data.Proxy
 import Control.Monad.Trans.State.Lazy as SL
 import Control.Monad.Trans.State.Strict as SS
 import qualified Control.Monad.Trans.Reader as R
 import qualified Control.Monad.Trans.Except as Exc
+import Control.Monad.Classes.Custom
 
 run :: Identity a -> a
 run = runIdentity
@@ -61,6 +65,15 @@ evalWriterStrict = evalStateStrict mempty
 
 execWriterStrict :: (Monad m, Monoid w) => SS.StateT w m a -> m w
 execWriterStrict = execStateStrict mempty
+
+evalWriterWith
+  :: forall w m a . (w -> m ())
+  -> (forall (q :: *). Reifies q (w -> m ()) => CustomWriterT q w m a)
+  -> m a
+evalWriterWith tellFn a =
+  reify tellFn $ \(Proxy :: Proxy q) ->
+    case a :: CustomWriterT q w m a of
+      CustomWriterT a' -> a'
 
 runExcept :: Exc.ExceptT e m a -> m (Either e a)
 runExcept = Exc.runExceptT

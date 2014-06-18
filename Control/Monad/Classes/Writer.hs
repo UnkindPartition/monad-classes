@@ -12,13 +12,17 @@ import qualified Control.Monad.Trans.State.Strict as SS
 import Control.Monad.Trans.Class
 import GHC.Prim (Proxy#, proxy#)
 import Control.Monad.Classes.Core
+import Control.Monad.Classes.Custom
 import Data.Monoid
+import Data.Reflection
+import Data.Proxy
 
 -- | Writer effect
 data EffWriter (w :: *)
 
 type instance CanDo (WL.WriterT w m) eff = WriterCanDo w eff
 type instance CanDo (WS.WriterT w m) eff = WriterCanDo w eff
+type instance CanDo (CustomWriterT q w m) eff = WriterCanDo w eff
 
 type family WriterCanDo w eff where
   WriterCanDo w (EffWriter w) = True
@@ -42,6 +46,9 @@ instance (Monad m, Monoid w) => MonadWriterN Zero w (SS.StateT w m) where
     where
       modify' :: (s -> s) -> SS.StateT s m ()
       modify' f = SS.state (\s -> let s' = f s in s' `seq` ((), s'))
+
+instance (Monad m, Reifies q (w -> m ())) => MonadWriterN Zero w (CustomWriterT q w m) where
+  tellN _ = CustomWriterT . reflect (Proxy :: Proxy q)
 
 instance (MonadTrans t, Monad (t m), MonadWriterN n w m, Monad m)
   => MonadWriterN (Suc n) w (t m)
