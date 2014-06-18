@@ -24,6 +24,8 @@ module Control.Monad.Classes.Run
   , evalWriterWith
     -- * Except
   , runExcept
+    -- * Zoom
+  , runZoom
   ) where
 
 import Data.Functor.Identity
@@ -35,6 +37,7 @@ import Control.Monad.Trans.State.Strict as SS
 import qualified Control.Monad.Trans.Reader as R
 import qualified Control.Monad.Trans.Except as Exc
 import Control.Monad.Classes.Custom
+import Control.Monad.Classes.Zoom
 
 run :: Identity a -> a
 run = runIdentity
@@ -74,6 +77,16 @@ evalWriterWith tellFn a =
   reify tellFn $ \(Proxy :: Proxy q) ->
     case a :: CustomWriterT q w m a of
       CustomWriterT a' -> a'
+
+runZoom
+  :: forall big small m a .
+     (forall f. Functor f => (small -> f small) -> big -> f big)
+  -> (forall (q :: *). Reifies q (VLLens big small) => ZoomT q big small m a)
+  -> m a
+runZoom l a =
+  reify (VLLens l) $ \(Proxy :: Proxy q) ->
+    case a :: ZoomT q big small m a of
+      ZoomT a' -> a'
 
 runExcept :: Exc.ExceptT e m a -> m (Either e a)
 runExcept = Exc.runExceptT

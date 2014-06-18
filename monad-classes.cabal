@@ -25,6 +25,7 @@ library
     Control.Monad.Classes.Except,
     Control.Monad.Classes.Exec,
     Control.Monad.Classes.Custom,
+    Control.Monad.Classes.Zoom,
     Control.Monad.Classes.Core
   build-depends:
     base >=4.7,
