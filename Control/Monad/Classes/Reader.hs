@@ -1,15 +1,4 @@
-module Control.Monad.Classes.Reader
-  ( MonadReader
-  , MonadLocal
-  , ask
-  , local
-  , reader
-  , MonadReaderN(..)
-  , MonadLocalN(..)
-  , EffReader
-  , EffLocal
-  )
-  where
+module Control.Monad.Classes.Reader where
 import Control.Monad
 import qualified Control.Monad.Trans.Reader as R
 import qualified Control.Monad.Trans.State.Lazy as SL
@@ -100,3 +89,6 @@ reader :: forall a r m . MonadReader r m
        => (r -> a)  -- ^ The selector function to apply to the environment.
        -> m a
 reader = readerN (proxy# :: Proxy# (Find (EffReader r) m))
+
+runReader :: r -> R.ReaderT r m a -> m a
+runReader = flip R.runReaderT

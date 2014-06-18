@@ -1,15 +1,4 @@
-module Control.Monad.Classes.State
-  ( MonadState
-  , get
-  , put
-  , state
-  , modify
-  , modify'
-  , gets
-  , MonadStateN(..)
-  , EffState
-  )
-  where
+module Control.Monad.Classes.State where
 import qualified Control.Monad.Trans.State.Lazy as SL
 import qualified Control.Monad.Trans.State.Strict as SS
 import Control.Monad.Trans.Class
@@ -78,3 +67,18 @@ modify f = state (\s -> ((), f s))
 -- new state
 modify' :: MonadState s m => (s -> s) -> m ()
 modify' f = state (\s -> let s' = f s in s' `seq` ((), s'))
+
+runStateLazy   :: s -> SL.StateT s m a -> m (a, s)
+runStateLazy   =  flip SL.runStateT
+runStateStrict :: s -> SS.StateT s m a -> m (a, s)
+runStateStrict =  flip SS.runStateT
+
+evalStateLazy   :: Monad m => s -> SL.StateT s m a -> m a
+evalStateLazy   =  flip SL.evalStateT
+evalStateStrict :: Monad m => s -> SS.StateT s m a -> m a
+evalStateStrict =  flip SS.evalStateT
+
+execStateLazy   :: Monad m => s -> SL.StateT s m a -> m s
+execStateLazy   = flip SL.execStateT
+execStateStrict :: Monad m => s -> SS.StateT s m a -> m s
+execStateStrict = flip SS.execStateT

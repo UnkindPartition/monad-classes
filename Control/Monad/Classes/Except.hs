@@ -1,10 +1,4 @@
-module Control.Monad.Classes.Except
-  ( MonadExcept
-  , throw
-  , MonadExceptN(..)
-  , EffExcept
-  )
-  where
+module Control.Monad.Classes.Except where
 import qualified Control.Monad.Trans.Except as Exc
 import qualified Control.Exception as E
 import Control.Monad.Trans.Class
@@ -43,3 +37,6 @@ type MonadExcept e m = MonadExceptN (Find (EffExcept e) m) e m
 -- | Throw an exception
 throw :: forall a e m . MonadExcept e m => e -> m a
 throw = throwN (proxy# :: Proxy# (Find (EffExcept e) m))
+
+runExcept :: Exc.ExceptT e m a -> m (Either e a)
+runExcept = Exc.runExceptT
