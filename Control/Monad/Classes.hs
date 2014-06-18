@@ -23,12 +23,7 @@ module Control.Monad.Classes
   , exec
     -- * Core classes and types
     -- ** Effects
-  , EffState
-  , EffReader
-  , EffLocal
-  , EffWriter
-  , EffExcept
-  , EffExec
+  , module Control.Monad.Classes.Effects
     -- ** N-classes
   , Nat(..)
   , MonadStateN(..)
@@ -46,6 +41,7 @@ module Control.Monad.Classes
   , CanDo
   ) where
 
+import Control.Monad.Classes.Effects
 import Control.Monad.Classes.Core
 import Control.Monad.Classes.State
 import Control.Monad.Classes.Reader

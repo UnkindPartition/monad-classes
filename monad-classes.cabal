@@ -25,7 +25,8 @@ library
     Control.Monad.Classes.Except,
     Control.Monad.Classes.Exec,
     Control.Monad.Classes.Zoom,
-    Control.Monad.Classes.Core
+    Control.Monad.Classes.Core,
+    Control.Monad.Classes.Effects
   build-depends:
     base >=4.7,
     mmorph >= 1.0.3,

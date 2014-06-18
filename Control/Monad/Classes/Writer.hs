@@ -8,12 +8,10 @@ import qualified Control.Monad.Trans.State.Strict as SS
 import Control.Monad.Trans.Class
 import GHC.Prim (Proxy#, proxy#)
 import Control.Monad.Classes.Core
+import Control.Monad.Classes.Effects
 import Data.Monoid
 import Data.Reflection
 import Data.Proxy
-
--- | Writer effect
-data EffWriter (w :: *)
 
 type instance CanDo (WL.WriterT w m) eff = WriterCanDo w eff
 type instance CanDo (WS.WriterT w m) eff = WriterCanDo w eff

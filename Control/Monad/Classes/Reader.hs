@@ -7,13 +7,7 @@ import Control.Monad.Morph (MFunctor, hoist)
 import Control.Monad.Trans.Class
 import GHC.Prim (Proxy#, proxy#)
 import Control.Monad.Classes.Core
-import Control.Monad.Classes.State
-
--- | Reader effect
-data EffReader (e :: *)
-
--- | Local state change effect
-data EffLocal (e :: *)
+import Control.Monad.Classes.Effects
 
 type instance CanDo (R.ReaderT e m) eff = ReaderCanDo e eff
 
@@ -45,19 +39,19 @@ class Monad m => MonadLocalN (n :: Nat) r m where
 instance Monad m => MonadLocalN Zero r (R.ReaderT r m) where
   localN _ = R.local
 
-stateLocal :: MonadState s m => (s -> s) -> m a -> m a
-stateLocal f a = do
-  s <- get
-  put (f s)
+stateLocal :: Monad m => (a -> m ()) -> m a -> (a -> a) -> m b -> m b
+stateLocal putFn getFn f a = do
+  s <- getFn
+  putFn (f s)
   r <- a
-  put s
+  putFn s
   return r
 
 instance (Monad m) => MonadLocalN Zero r (SL.StateT r m) where
-  localN _ = stateLocal
+  localN _ = stateLocal SL.put SL.get
 
 instance (Monad m) => MonadLocalN Zero r (SS.StateT r m) where
-  localN _ = stateLocal
+  localN _ = stateLocal SS.put SS.get
 
 instance (MonadTrans t, Monad (t m), MFunctor t, MonadLocalN n r m, Monad m)
   => MonadLocalN (Suc n) r (t m)

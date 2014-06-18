@@ -4,13 +4,7 @@ import qualified Control.Monad.Trans.State.Strict as SS
 import Control.Monad.Trans.Class
 import GHC.Prim (Proxy#, proxy#)
 import Control.Monad.Classes.Core
-import {-# SOURCE #-} Control.Monad.Classes.Reader
-  (EffReader, EffLocal)
-import Control.Monad.Classes.Writer
-  (EffWriter)
-
--- | State effect
-data EffState (s :: *)
+import Control.Monad.Classes.Effects
 
 type instance CanDo (SS.StateT s m) eff = StateCanDo s eff
 type instance CanDo (SL.StateT s m) eff = StateCanDo s eff
