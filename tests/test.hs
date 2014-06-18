@@ -1,5 +1,5 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving, NoMonomorphismRestriction,
-             DataKinds, TypeFamilies #-}
+             DataKinds, TypeFamilies, TemplateHaskell, ScopedTypeVariables #-}
 import Test.Tasty
 import Test.Tasty.HUnit
 import Control.Monad.Trans.Class
@@ -7,10 +7,20 @@ import Control.Monad.Classes
 import Control.Monad.Classes.Run
 import Control.Applicative
 import Control.Exception hiding (throw)
+import Data.Lens.Light
 
 -- for IO tests
 import qualified Foreign.Storable as Foreign
 import qualified Foreign.Marshal.Alloc as Foreign
+
+-- for zoom tests
+data Record = Record
+  { _listL :: [Int]
+  , _intL :: Int
+  }
+  deriving (Show, Eq)
+
+makeLens ''Record
 
 main = defaultMain tests
 
@@ -22,6 +32,7 @@ tests = testGroup "Tests"
   , localState
   , exceptTests
   , execTests
+  , zoomTests
   ]
 
 simpleStateTests = testGroup "Simple State"
@@ -74,3 +85,15 @@ execTests = testCase "Exec" $ do
       Foreign.poke ptr True
       Foreign.peek ptr
   r @?= (True, ())
+
+zoomTests = testCase "Zoom" $ do
+  ((4, [2,5], 6), Record [2,5,10] 6) @?=
+    (run $ runStateStrict (Record [2] 4) $ runZoom (vanLaarhoven intL) $ runZoom (vanLaarhoven listL) $ do
+      (s0 :: Int) <- get
+      tell [5 :: Int]
+      (s1 :: [Int]) <- ask
+      put (6 :: Int)
+      (s2 :: Int) <- ask
+      tell [10 :: Int]
+      return (s0, s1, s2)
+    )
