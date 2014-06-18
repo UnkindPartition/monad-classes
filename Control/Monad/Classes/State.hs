@@ -21,7 +21,7 @@ import Control.Monad.Classes.Writer
   (EffWriter)
 
 -- | State effect
-data EffState s
+data EffState (s :: *)
 
 type instance CanDo (SS.StateT s m) eff = StateCanDo s eff
 type instance CanDo (SL.StateT s m) eff = StateCanDo s eff

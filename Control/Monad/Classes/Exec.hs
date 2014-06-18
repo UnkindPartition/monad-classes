@@ -10,7 +10,7 @@ import GHC.Prim (Proxy#, proxy#)
 import Control.Monad.Classes.Core
 
 -- | IO effect
-data EffExec w
+data EffExec (w :: * -> *)
 
 type instance CanDo IO (EffExec IO) = True
 

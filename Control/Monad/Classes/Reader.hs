@@ -21,10 +21,10 @@ import Control.Monad.Classes.Core
 import Control.Monad.Classes.State
 
 -- | Reader effect
-data EffReader e
+data EffReader (e :: *)
 
 -- | Local state change effect
-data EffLocal e
+data EffLocal (e :: *)
 
 type instance CanDo (R.ReaderT e m) eff = ReaderCanDo e eff
 

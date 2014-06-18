@@ -14,7 +14,7 @@ import Control.Monad.Classes.Core
 import Data.Monoid
 
 -- | Writer effect
-data EffWriter w
+data EffWriter (w :: *)
 
 type instance CanDo (W.WriterT w m) eff = WriterCanDo w eff
 
