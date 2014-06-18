@@ -24,6 +24,7 @@ module Control.Monad.Classes.Run
   , evalWriterWith
     -- * Except
   , runExcept
+  , runMaybe
     -- * Zoom
   , runZoom
   ) where
