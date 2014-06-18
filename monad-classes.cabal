@@ -69,4 +69,4 @@ Test-suite test
     , tasty-hunit
     , monad-classes
     , transformers
-    , data-lens-light
+    , data-lens-light >= 0.1.2
