@@ -5,7 +5,8 @@ module Control.Monad.Classes.Writer
   , EffWriter
   )
   where
-import qualified Control.Monad.Trans.Writer as W
+import qualified Control.Monad.Trans.Writer.Lazy as WL
+import qualified Control.Monad.Trans.Writer.Strict as WS
 import qualified Control.Monad.Trans.State.Lazy as SL
 import qualified Control.Monad.Trans.State.Strict as SS
 import Control.Monad.Trans.Class
@@ -16,7 +17,8 @@ import Data.Monoid
 -- | Writer effect
 data EffWriter (w :: *)
 
-type instance CanDo (W.WriterT w m) eff = WriterCanDo w eff
+type instance CanDo (WL.WriterT w m) eff = WriterCanDo w eff
+type instance CanDo (WS.WriterT w m) eff = WriterCanDo w eff
 
 type family WriterCanDo w eff where
   WriterCanDo w (EffWriter w) = True
@@ -25,8 +27,11 @@ type family WriterCanDo w eff where
 class Monad m => MonadWriterN (n :: Nat) w m where
   tellN :: Proxy# n -> (w -> m ())
 
-instance (Monad m, Monoid w) => MonadWriterN Zero w (W.WriterT w m) where
-  tellN _ = W.tell
+instance (Monad m, Monoid w) => MonadWriterN Zero w (WL.WriterT w m) where
+  tellN _ = WL.tell
+
+instance (Monad m, Monoid w) => MonadWriterN Zero w (WS.WriterT w m) where
+  tellN _ = WS.tell
 
 instance (Monad m, Monoid w) => MonadWriterN Zero w (SL.StateT w m) where
   -- lazy
