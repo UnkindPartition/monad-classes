@@ -8,9 +8,7 @@ module Control.Monad.Classes.Exec
 import Control.Monad.Trans.Class
 import GHC.Prim (Proxy#, proxy#)
 import Control.Monad.Classes.Core
-
--- | IO effect
-data EffExec (w :: * -> *)
+import Control.Monad.Classes.Effects
 
 type instance CanDo IO (EffExec IO) = True
 

@@ -11,3 +11,6 @@ data EffLocal (e :: *)
 
 -- | State effect
 data EffState (s :: *)
+
+-- | Arbitrary monadic effect
+data EffExec (w :: * -> *)
