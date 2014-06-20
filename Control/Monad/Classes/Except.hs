@@ -6,9 +6,7 @@ import Control.Monad
 import Control.Monad.Trans.Class
 import GHC.Prim (Proxy#, proxy#)
 import Control.Monad.Classes.Core
-
--- | Except effect
-data EffExcept (e :: *)
+import Control.Monad.Classes.Effects
 
 type instance CanDo IO (EffExcept e) = True
 

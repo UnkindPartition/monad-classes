@@ -14,3 +14,6 @@ data EffState (s :: *)
 
 -- | Arbitrary monadic effect
 data EffExec (w :: * -> *)
+
+-- | Except effect
+data EffExcept (e :: *)
