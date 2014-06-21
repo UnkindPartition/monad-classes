@@ -5,6 +5,8 @@ import qualified Control.Monad.Trans.Writer.Lazy as WL
 import qualified Control.Monad.Trans.Writer.Strict as WS
 import qualified Control.Monad.Trans.State.Lazy as SL
 import qualified Control.Monad.Trans.State.Strict as SS
+import Control.Monad.Base
+import Control.Monad.Trans.Control
 import Control.Monad.Trans.Class
 import Control.Monad.Classes.Core
 import Control.Monad.Classes.Effects
@@ -13,7 +15,7 @@ import Data.Monoid
 
 type instance CanDo (WL.WriterT w m) eff = WriterCanDo w eff
 type instance CanDo (WS.WriterT w m) eff = WriterCanDo w eff
-type instance CanDo (CustomWriterT w m) eff = WriterCanDo w eff
+type instance CanDo (CustomWriterT' w n m) eff = WriterCanDo w eff
 
 type family WriterCanDo w eff where
   WriterCanDo w (EffWriter w) = True
@@ -38,7 +40,7 @@ instance (Monad m, Monoid w) => MonadWriterN Zero w (SS.StateT w m) where
       modify' :: (s -> s) -> SS.StateT s m ()
       modify' f = SS.state (\s -> let s' = f s in s' `seq` ((), s'))
 
-instance Monad m => MonadWriterN Zero w (CustomWriterT w m) where
+instance Monad m => MonadWriterN Zero w (CustomWriterT' w m m) where
   tellN _ w = CustomWriterT $ Proxied $ \px -> reflect px w
 
 instance (MonadTrans t, Monad (t m), MonadWriterN n w m, Monad m)
@@ -63,11 +65,19 @@ evalWriterStrict = flip SS.evalStateT mempty
 execWriterStrict :: (Monad m, Monoid w) => SS.StateT w m a -> m w
 execWriterStrict = flip SS.execStateT mempty
 
-newtype CustomWriterT w m a = CustomWriterT (Proxied (w -> m ()) m a)
-  deriving (Functor, Applicative, Monad, Alternative, MonadPlus)
+-- The separation between 'n' and 'm' types is needed to implement
+-- the MonadTransControl instance
+newtype CustomWriterT' w n m a = CustomWriterT (Proxied (w -> n ()) m a)
+  deriving (Functor, Applicative, Monad, Alternative, MonadPlus, MonadBase b)
+type CustomWriterT w m a = CustomWriterT' w m m a
 
-instance MonadTrans (CustomWriterT w) where
+instance MonadTrans (CustomWriterT' w n) where
   lift a = CustomWriterT $ Proxied $ \_ -> a
+
+instance MonadTransControl (CustomWriterT' w n) where
+  newtype StT (CustomWriterT' w n) a = StW { unStW :: StT (Proxied (w -> n ())) a  }
+  liftWith = defaultLiftWith CustomWriterT (\(CustomWriterT a) -> a) StW
+  restoreT = defaultRestoreT CustomWriterT unStW
 
 evalWriterWith
   :: forall w m a . (w -> m ())
