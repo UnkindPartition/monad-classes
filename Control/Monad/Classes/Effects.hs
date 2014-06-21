@@ -13,13 +13,7 @@ data EffLocal (e :: *)
 data EffState (s :: *)
 
 -- | Arbitrary monadic effect
---
--- Examples:
---
--- * @EffExec IO@
---
--- * @EffExec ResourceT@
-data EffExec w
+data EffExec (w :: * -> *)
 
 -- | Except effect
 data EffExcept (e :: *)
