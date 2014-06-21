@@ -8,6 +8,8 @@ module Control.Monad.Classes.Proxied
 
 import Control.Applicative
 import Control.Monad
+import Control.Monad.Base
+import Control.Monad.Trans.Control
 import Control.Monad.Trans.Class
 import GHC.Prim (Proxy#, proxy#)
 import qualified Data.Reflection as R
@@ -39,6 +41,15 @@ instance MonadPlus m => MonadPlus (Proxied x m) where
 
 instance MonadTrans (Proxied x) where
   lift a = Proxied $ \_ -> a
+
+instance MonadBase b m => MonadBase b (Proxied x m) where
+  liftBase = liftBaseDefault
+
+instance MonadTransControl (Proxied x) where
+  data StT (Proxied x) a = StProxied { unStProxied :: a }
+  liftWith f = Proxied $ \px -> f $ \(Proxied a) ->
+    StProxied `liftM` a px
+  restoreT a = Proxied $ \_ -> unStProxied `liftM` a
 
 fromProxy# :: Proxy# a -> Proxy a
 fromProxy# _ = Proxy
