@@ -9,6 +9,7 @@ module Control.Monad.Classes.Proxied
 import Control.Applicative
 import Control.Monad
 import Control.Monad.Base
+import Control.Monad.IO.Class
 import Control.Monad.Trans.Control
 import Control.Monad.Trans.Class
 import GHC.Prim (Proxy#, proxy#)
@@ -41,6 +42,9 @@ instance MonadPlus m => MonadPlus (Proxied x m) where
 
 instance MonadTrans (Proxied x) where
   lift a = Proxied $ \_ -> a
+
+instance MonadIO m => MonadIO (Proxied x m) where
+  liftIO = lift . liftIO
 
 instance MonadBase b m => MonadBase b (Proxied x m) where
   liftBase = liftBaseDefault

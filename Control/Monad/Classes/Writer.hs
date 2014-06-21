@@ -8,6 +8,7 @@ import qualified Control.Monad.Trans.State.Strict as SS
 import Control.Monad.Base
 import Control.Monad.Trans.Control
 import Control.Monad.Trans.Class
+import Control.Monad.IO.Class
 import Control.Monad.Classes.Core
 import Control.Monad.Classes.Effects
 import Control.Monad.Classes.Proxied
@@ -68,7 +69,7 @@ execWriterStrict = flip SS.execStateT mempty
 -- The separation between 'n' and 'm' types is needed to implement
 -- the MonadTransControl instance
 newtype CustomWriterT' w n m a = CustomWriterT (Proxied (w -> n ()) m a)
-  deriving (Functor, Applicative, Monad, Alternative, MonadPlus, MonadBase b)
+  deriving (Functor, Applicative, Monad, Alternative, MonadPlus, MonadBase b, MonadIO)
 type CustomWriterT w m a = CustomWriterT' w m m a
 
 instance MonadTrans (CustomWriterT' w n) where
