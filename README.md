@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/feuerbach/monad-classes.svg?branch=master)](https://travis-ci.org/feuerbach/monad-classes)
+
 This is a more flexible version of mtl, the monad transformers library.
 
 *   You can have many layers of e.g. state transformers in your stack, and
