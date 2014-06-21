@@ -21,6 +21,8 @@ module Control.Monad.Classes
   , MonadExec
   , exec
     -- * Core classes and types
+    -- ** Generic lifting
+  , MonadLiftN(..)
     -- ** Effects
   , module Control.Monad.Classes.Effects
     -- ** N-classes
