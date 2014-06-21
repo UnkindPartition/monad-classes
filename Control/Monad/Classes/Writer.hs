@@ -79,6 +79,11 @@ instance MonadTransControl (CustomWriterT' w n) where
   liftWith = defaultLiftWith CustomWriterT (\(CustomWriterT a) -> a) StW
   restoreT = defaultRestoreT CustomWriterT unStW
 
+instance MonadBaseControl b m => MonadBaseControl b (CustomWriterT' w n m) where
+    newtype StM (CustomWriterT' w n m) a = StMW {unStMW :: ComposeSt (CustomWriterT' w n) m a}
+    liftBaseWith = defaultLiftBaseWith StMW
+    restoreM     = defaultRestoreM   unStMW
+
 evalWriterWith
   :: forall w m a . (w -> m ())
   -> CustomWriterT w m a
