@@ -4,7 +4,9 @@
 import Test.Tasty
 import Test.Tasty.HUnit
 import Control.Monad.Trans.Class
+import qualified Data.Functor.Identity as I
 import qualified Control.Monad.Trans.Reader as R
+import qualified Control.Monad.Trans.Writer as W
 import Control.Monad.Classes
 import Control.Monad.Classes.Run
 import Control.Applicative
@@ -15,6 +17,10 @@ import GHC.Prim (Proxy#, proxy#)
 -- for IO tests
 import qualified Foreign.Storable as Foreign
 import qualified Foreign.Marshal.Alloc as Foreign
+
+-- for monad-control tests
+import qualified Data.Conduit as C
+import Control.Monad.Morph
 
 -- for zoom tests
 data Record = Record
@@ -37,6 +43,7 @@ tests = testGroup "Tests"
   , execTests
   , zoomTests
   , liftNTests
+  , liftConduitTest
   ]
 
 simpleStateTests = testGroup "Simple State"
@@ -106,3 +113,40 @@ liftNTests = testCase "liftN" $ do
   (run $ runReader 'a' $ runReader 'b' $ runReader 'c' $
     liftN (proxy# :: Proxy# (Suc Zero)) R.ask)
   @?= 'b'
+
+
+liftConduit
+  :: forall m n effM eff i o r .
+     ( n ~ Find eff m
+     , MonadLiftN n m
+     , effM ~ Down n m
+     , Monad effM
+     )
+  => Proxy# eff
+  -> C.ConduitM i o effM r
+  -> C.ConduitM i o m    r
+liftConduit _ = hoist (liftN (proxy# :: Proxy# n))
+
+liftConduitTest = testCase "lift conduit" $
+  (let
+    src :: C.Source I.Identity Int
+    src = C.yield 1 >> C.yield 2
+
+    sink :: C.Sink Int (W.Writer [Int]) ()
+    sink =
+      C.await >>=
+        maybe (return ()) (\x -> do lift $ tell [x::Int]; sink)
+   in
+    W.execWriter $ hoist (liftN (proxy# :: Proxy# (Suc Zero))) src C.$$ sink
+  ) @?= [1,2]
+  {-
+
+  execWriterStrict $ runReader (3 :: Int) $
+    liftConduit (proxy# :: Proxy# (EffReader Int))
+      (do
+        x <- ask
+        liftConduit (C.yield x)
+        liftConduit (C.yield (x :: Int)))
+    C.$$
+      (proxy# :: Proxy# (EffWriter String)) (do C.awaitForever $ \y -> tell (show (y :: Int) ++ "\n")))
+  @?= ""-}

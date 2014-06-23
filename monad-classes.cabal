@@ -74,3 +74,5 @@ Test-suite test
     , transformers
     , data-lens-light >= 0.1.2
     , ghc-prim
+    , conduit
+    , mmorph
