@@ -1,13 +1,16 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving, NoMonomorphismRestriction,
-             DataKinds, TypeFamilies, TemplateHaskell, ScopedTypeVariables #-}
+             DataKinds, TypeFamilies, TemplateHaskell, ScopedTypeVariables,
+             MagicHash #-}
 import Test.Tasty
 import Test.Tasty.HUnit
 import Control.Monad.Trans.Class
+import qualified Control.Monad.Trans.Reader as R
 import Control.Monad.Classes
 import Control.Monad.Classes.Run
 import Control.Applicative
 import Control.Exception hiding (throw)
 import Data.Lens.Light
+import GHC.Prim (Proxy#, proxy#)
 
 -- for IO tests
 import qualified Foreign.Storable as Foreign
@@ -33,6 +36,7 @@ tests = testGroup "Tests"
   , exceptTests
   , execTests
   , zoomTests
+  , liftNTests
   ]
 
 simpleStateTests = testGroup "Simple State"
@@ -97,3 +101,8 @@ zoomTests = testCase "Zoom" $ do
       tell [10 :: Int]
       return (s0, s1, s2)
     )
+
+liftNTests = testCase "liftN" $ do
+  (run $ runReader 'a' $ runReader 'b' $ runReader 'c' $
+    liftN (proxy# :: Proxy# (Suc Zero)) R.ask)
+  @?= 'b'

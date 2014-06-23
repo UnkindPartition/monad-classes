@@ -73,3 +73,4 @@ Test-suite test
     , monad-classes
     , transformers
     , data-lens-light >= 0.1.2
+    , ghc-prim
