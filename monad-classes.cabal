@@ -36,7 +36,6 @@ library
     transformers-base >= 0.4.2,
     monad-control >= 0.3.3,
     reflection >= 1.4,
-    tagged,
     ghc-prim
   -- hs-source-dirs:
   default-language:    Haskell2010
