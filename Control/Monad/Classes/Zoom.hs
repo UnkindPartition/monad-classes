@@ -3,6 +3,8 @@ module Control.Monad.Classes.Zoom where
 import Control.Applicative
 import Control.Monad
 import Control.Monad.Trans.Class
+import Control.Monad.Base
+import Control.Monad.Trans.Control
 import Control.Monad.Classes.Core
 import Control.Monad.Classes.Effects
 import Control.Monad.Classes.Reader
@@ -13,7 +15,7 @@ import Data.Functor.Identity
 import Data.Monoid
 
 newtype ZoomT big small m a = ZoomT (Proxied (VLLens big small) m a)
-  deriving (Functor, Applicative, Alternative, Monad, MonadPlus, MonadTrans)
+  deriving (Functor, Applicative, Alternative, Monad, MonadPlus, MonadTrans, MonadBase b)
 
 newtype VLLens big small = VLLens (forall f . Functor f => (small -> f small) -> big -> f big)
 
@@ -63,3 +65,13 @@ instance (MonadState big m, Monoid small) => MonadWriterN Zero small (ZoomT big 
     state $ \s ->
       let s' = vlMod' l (<> w) s
       in s' `seq` ((), s')
+
+instance MonadTransControl (ZoomT big small) where
+  newtype StT (ZoomT big small) a = StZ { unStZ :: StT (Proxied (VLLens big small)) a  }
+  liftWith = defaultLiftWith ZoomT (\(ZoomT a) -> a) StZ
+  restoreT = defaultRestoreT ZoomT unStZ
+
+instance MonadBaseControl b m => MonadBaseControl b (ZoomT big small m) where
+    newtype StM (ZoomT big small m) a = StMZ {unStMZ :: ComposeSt (ZoomT big small) m a}
+    liftBaseWith = defaultLiftBaseWith StMZ
+    restoreM     = defaultRestoreM   unStMZ
