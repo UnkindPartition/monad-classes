@@ -1,3 +1,15 @@
+-- | 'Proxied' monad. @'Proxied' x@ is a monad transformer that has a global
+-- configuration parameter of type @x@ associated with it.
+--
+-- It is used to implement things like @ZoomT@\/@runZoom@ and
+-- @CustromWriterT@\/@evalWriterWith@.
+--
+-- Most of the time you don't need to use this directly. It is exported for two purposes:
+--
+-- * you can use it to define new monad transformers
+--
+-- * you can define instances for @'Proxied' x@ and transformers that are
+-- based on it
 module Control.Monad.Classes.Proxied
   ( module Control.Monad.Classes.Proxied
   , R.Reifies

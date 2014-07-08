@@ -18,6 +18,7 @@ library
   exposed-modules:
     Control.Monad.Classes
     Control.Monad.Classes.Run
+    Control.Monad.Classes.Proxied
   other-modules:
     Control.Monad.Classes.State,
     Control.Monad.Classes.Writer,
@@ -26,8 +27,7 @@ library
     Control.Monad.Classes.Exec,
     Control.Monad.Classes.Zoom,
     Control.Monad.Classes.Core,
-    Control.Monad.Classes.Effects,
-    Control.Monad.Classes.Proxied
+    Control.Monad.Classes.Effects
   build-depends:
     base >=4.7,
     mmorph >= 1.0.3,
