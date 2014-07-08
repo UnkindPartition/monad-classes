@@ -4,6 +4,7 @@ import Control.Applicative
 import Control.Monad
 import Control.Monad.Trans.Class
 import Control.Monad.Base
+import Control.Monad.IO.Class
 import Control.Monad.Trans.Control
 import Control.Monad.Classes.Core
 import Control.Monad.Classes.Effects
@@ -15,7 +16,7 @@ import Data.Functor.Identity
 import Data.Monoid
 
 newtype ZoomT big small m a = ZoomT (Proxied (VLLens big small) m a)
-  deriving (Functor, Applicative, Alternative, Monad, MonadPlus, MonadTrans, MonadBase b)
+  deriving (Functor, Applicative, Alternative, Monad, MonadPlus, MonadTrans, MonadBase b, MonadIO)
 
 newtype VLLens big small = VLLens (forall f . Functor f => (small -> f small) -> big -> f big)
 
