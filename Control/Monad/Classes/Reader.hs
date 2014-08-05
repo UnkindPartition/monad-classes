@@ -77,5 +77,8 @@ local :: forall a m r. MonadLocal r m
       -> m a
 local = localN (proxy# :: Proxy# (Find (EffLocal r) m))
 
+-- | Run a 'MonadReader' effect using 'R.ReaderT'.
+--
+-- This is a flipped 'R.runReaderT'.
 runReader :: r -> R.ReaderT r m a -> m a
 runReader = flip R.runReaderT
