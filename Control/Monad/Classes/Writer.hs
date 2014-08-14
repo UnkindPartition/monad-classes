@@ -93,3 +93,12 @@ evalWriterWith tellFn a =
   reify tellFn $ \px ->
     case a of
       CustomWriterT (Proxied a') -> a' px
+
+-- | Transform all writer requests with a given function
+mapWriter
+  :: forall w1 w2 m a . MonadWriter w2 m
+  => (w1 -> w2)
+  -> CustomWriterT w1 m a
+  -> m a
+mapWriter f a =
+  evalWriterWith (\w1 -> tell (f w1)) a

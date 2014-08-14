@@ -22,6 +22,7 @@ module Control.Monad.Classes.Run
   , evalWriterStrict
   , execWriterStrict
   , evalWriterWith
+  , mapWriter
   , CustomWriterT'(..)
   , CustomWriterT
     -- * Except
