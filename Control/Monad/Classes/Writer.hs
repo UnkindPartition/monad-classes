@@ -66,6 +66,15 @@ evalWriterStrict = flip SS.evalStateT mempty
 execWriterStrict :: (Monad m, Monoid w) => SS.StateT w m a -> m w
 execWriterStrict = flip SS.execStateT mempty
 
+runWriterLazy :: (Monad m, Monoid w) => WL.WriterT w m a -> m (a, w)
+runWriterLazy = WL.runWriterT
+
+evalWriterLazy :: (Monad m, Monoid w) => WL.WriterT w m a -> m a
+evalWriterLazy = liftM fst . runWriterLazy
+
+execWriterLazy :: (Monad m, Monoid w) => WL.WriterT w m a -> m w
+execWriterLazy = WL.execWriterT
+
 -- The separation between 'n' and 'm' types is needed to implement
 -- the MonadTransControl instance
 newtype CustomWriterT' w n m a = CustomWriterT (Proxied (w -> n ()) m a)

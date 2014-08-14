@@ -18,8 +18,11 @@ module Control.Monad.Classes.Run
   , execStateLazy
   , execStateStrict
     -- * Writer
+  , runWriterLazy
   , runWriterStrict
+  , evalWriterLazy
   , evalWriterStrict
+  , execWriterLazy
   , execWriterStrict
   , evalWriterWith
   , mapWriter
