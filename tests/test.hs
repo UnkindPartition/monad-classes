@@ -44,6 +44,7 @@ tests = testGroup "Tests"
   , zoomTests
   , liftNTests
   , liftConduitTest
+  , mapWriterTest
   ]
 
 simpleStateTests = testGroup "Simple State"
@@ -150,3 +151,6 @@ liftConduitTest = testCase "lift conduit" $
     C.$$
       (proxy# :: Proxy# (EffWriter String)) (do C.awaitForever $ \y -> tell (show (y :: Int) ++ "\n")))
   @?= ""-}
+
+mapWriterTest = testCase "mapWriter" $ do
+  run (execWriterStrict $ mapWriter (\(w :: Char) -> [w]) $ do { tell 'a'; tell 'b'; tell 'c' }) @?= "abc"
