@@ -5,12 +5,13 @@ import Test.Tasty
 import Test.Tasty.HUnit
 import Control.Monad.Trans.Class
 import qualified Data.Functor.Identity as I
+import qualified Control.Monad.Trans.Except as E
 import qualified Control.Monad.Trans.Reader as R
 import qualified Control.Monad.Trans.Writer as W
 import Control.Monad.Classes
 import Control.Monad.Classes.Run
 import Control.Applicative
-import Control.Exception hiding (throw)
+import Control.Exception hiding (catch, throw)
 import Data.Lens.Light
 import GHC.Prim (Proxy#, proxy#)
 
@@ -89,6 +90,21 @@ exceptTests = testGroup "Except"
   , testCase "Let escape to IO" $ do
       r <- try $ runExcept $ runStateStrict False $ throw UserInterrupt
       (r :: Either AsyncException (Either ErrorCall ((), Bool))) @?= Left UserInterrupt
+  , testCase "Catch directly in ExceptT" $ do
+      r <- runExcept $ flip catch (\UserInterrupt -> return ((), False)) $ runStateStrict True $ throw UserInterrupt
+      (r :: Either AsyncException ((), Bool)) @?= Right ((), False)
+  , testCase "Catch in IO" $ do
+      r <- flip catch (\UserInterrupt -> return ((), False)) $ runStateStrict True $ throw UserInterrupt
+      (r :: ((), Bool)) @?= ((), False)
+  , testCase "Catch below ExceptT" $ do
+      r <- runExcept $ runStateStrict True $ flip catch (\UserInterrupt -> put False) $ throw UserInterrupt
+      (r :: Either AsyncException ((), Bool)) @?= Right ((), False)
+  , testCase "withExcept in ExceptT" $ do
+      let r = I.runIdentity $ runExcept $ withExcept (\UserInterrupt -> ErrorCall "foo") $ runStateStrict True $ throw UserInterrupt
+      (r :: Either ErrorCall ((), Bool)) @?= Left (ErrorCall "foo")
+  , testCase "withExcept in IO" $ do
+      r <- try $ withExcept (\UserInterrupt -> ErrorCall "foo") $ runStateStrict True $ throw UserInterrupt
+      (r :: Either ErrorCall ((), Bool)) @?= Left (ErrorCall "foo")
   ]
 
 execTests = testCase "Exec" $ do

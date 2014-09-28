@@ -17,3 +17,9 @@ data EffExec (w :: * -> *)
 
 -- | Except effect
 data EffExcept (e :: *)
+
+-- | Catch effect
+data EffCatch (e :: *)
+
+-- | Map Except effect
+data EffMapExcept (e :: *)

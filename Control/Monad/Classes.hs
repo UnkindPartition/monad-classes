@@ -17,6 +17,12 @@ module Control.Monad.Classes
     -- * Exceptions
   , MonadExcept
   , throw
+  , catch
+  , withExcept
+  , note
+  , hush
+  , hoistMaybe
+  , hoistEither
     -- * Exec
   , MonadExec
   , exec
