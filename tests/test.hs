@@ -105,6 +105,9 @@ exceptTests = testGroup "Except"
   , testCase "withExcept in IO" $ do
       r <- try $ withExcept (\UserInterrupt -> ErrorCall "foo") $ runStateStrict True $ throw UserInterrupt
       (r :: Either ErrorCall ((), Bool)) @?= Left (ErrorCall "foo")
+  , testCase "ExceptT does not try to handle unknown effect" $ do
+      r <- runExcept $ exec $ putStrLn "hi"
+      ((r :: Either () ()) @?= Right ())
   ]
 
 execTests = testCase "Exec" $ do

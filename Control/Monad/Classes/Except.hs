@@ -17,16 +17,19 @@ type instance CanDo IO (EffExcept e) = True
 type instance CanDo IO (EffCatch e) = True
 type instance CanDo IO (EffMapExcept e) = True
 
-type instance CanDo (Exc.ExceptT e m) (EffExcept e') = e == e'
-type instance CanDo (Exc.ExceptT e m) (EffCatch e) = True
-type instance CanDo (Exc.ExceptT e m) (EffMapExcept e') = True
+type instance CanDo (Exc.ExceptT e m) eff = ExceptCanDo eff e
+
+type family ExceptCanDo eff e where
+  ExceptCanDo (EffExcept e') e = e == e'
+  ExceptCanDo (EffCatch e') e = e == e'
+  ExceptCanDo (EffMapExcept e') e = True
+  ExceptCanDo eff e = False
 
 type instance CanDo (Mb.MaybeT m) eff = MaybeTCanDo eff
 
 type family MaybeTCanDo eff where
   MaybeTCanDo (EffExcept ()) = True
   MaybeTCanDo (EffCatch ()) = True
-  MaybeTCanDo (EffMapExcept ()) = True
   MaybeTCanDo eff = False
 
 class Monad m => MonadExceptN (n :: Nat) e m where
