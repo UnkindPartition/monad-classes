@@ -1,5 +1,3 @@
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE InstanceSigs #-}
 module Control.Monad.Classes.Except where
 import qualified Control.Monad.Trans.Except as Exc
 import qualified Control.Monad.Trans.Maybe as Mb
