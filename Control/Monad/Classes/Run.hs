@@ -34,9 +34,6 @@ module Control.Monad.Classes.Run
     -- * Zoom
   , runZoom
   , ZoomT(..)
-    -- 'MonadBaseControl' state
-  , StT(..)
-  , StM(..)
   ) where
 
 import Data.Functor.Identity
@@ -45,7 +42,6 @@ import Control.Monad.Classes.State
 import Control.Monad.Classes.Writer
 import Control.Monad.Classes.Reader
 import Control.Monad.Classes.Except
-import Control.Monad.Trans.Control (MonadTransControl(StT),MonadBaseControl(StM))
 
 run :: Identity a -> a
 run = runIdentity

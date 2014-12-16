@@ -1,5 +1,5 @@
 name:                monad-classes
-version:             0.1
+version:             0.2
 synopsis:            more flexible mtl
 -- description:
 homepage:            https://github.com/feuerbach/monad-classes
@@ -34,7 +34,7 @@ library
     transformers >=0.2,
     transformers-compat >= 0.3.1,
     transformers-base >= 0.4.2,
-    monad-control >= 0.3.3,
+    monad-control >= 1,
     reflection >= 1.4,
     ghc-prim
   -- hs-source-dirs:

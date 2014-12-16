@@ -85,14 +85,14 @@ instance MonadTrans (CustomWriterT' w n) where
   lift a = CustomWriterT $ Proxied $ \_ -> a
 
 instance MonadTransControl (CustomWriterT' w n) where
-  newtype StT (CustomWriterT' w n) a = StW { unStW :: StT (Proxied (w -> n ())) a  }
-  liftWith = defaultLiftWith CustomWriterT (\(CustomWriterT a) -> a) StW
-  restoreT = defaultRestoreT CustomWriterT unStW
+  type StT (CustomWriterT' w n) a = StT (Proxied (w -> n ())) a
+  liftWith = defaultLiftWith CustomWriterT (\(CustomWriterT a) -> a)
+  restoreT = defaultRestoreT CustomWriterT
 
 instance MonadBaseControl b m => MonadBaseControl b (CustomWriterT' w n m) where
-    newtype StM (CustomWriterT' w n m) a = StMW {unStMW :: ComposeSt (CustomWriterT' w n) m a}
-    liftBaseWith = defaultLiftBaseWith StMW
-    restoreM     = defaultRestoreM   unStMW
+  type StM (CustomWriterT' w n m) a = ComposeSt (CustomWriterT' w n) m a
+  liftBaseWith = defaultLiftBaseWith
+  restoreM     = defaultRestoreM
 
 evalWriterWith
   :: forall w m a . (w -> m ())

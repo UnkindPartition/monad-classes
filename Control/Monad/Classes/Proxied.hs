@@ -62,10 +62,9 @@ instance MonadBase b m => MonadBase b (Proxied x m) where
   liftBase = liftBaseDefault
 
 instance MonadTransControl (Proxied x) where
-  data StT (Proxied x) a = StProxied { unStProxied :: a }
-  liftWith f = Proxied $ \px -> f $ \(Proxied a) ->
-    StProxied `liftM` a px
-  restoreT a = Proxied $ \_ -> unStProxied `liftM` a
+  type StT (Proxied x) a = a
+  liftWith f = Proxied $ \px -> f $ \(Proxied a) -> a px
+  restoreT a = Proxied $ \_ -> a
 
 fromProxy# :: Proxy# a -> Proxy a
 fromProxy# _ = Proxy

@@ -68,11 +68,11 @@ instance (MonadState big m, Monoid small) => MonadWriterN Zero small (ZoomT big 
       in s' `seq` ((), s')
 
 instance MonadTransControl (ZoomT big small) where
-  newtype StT (ZoomT big small) a = StZ { unStZ :: StT (Proxied (VLLens big small)) a  }
-  liftWith = defaultLiftWith ZoomT (\(ZoomT a) -> a) StZ
-  restoreT = defaultRestoreT ZoomT unStZ
+  type StT (ZoomT big small) a = a
+  liftWith = defaultLiftWith ZoomT (\(ZoomT a) -> a)
+  restoreT = defaultRestoreT ZoomT
 
 instance MonadBaseControl b m => MonadBaseControl b (ZoomT big small m) where
-    newtype StM (ZoomT big small m) a = StMZ {unStMZ :: ComposeSt (ZoomT big small) m a}
-    liftBaseWith = defaultLiftBaseWith StMZ
-    restoreM     = defaultRestoreM   unStMZ
+    type StM (ZoomT big small m) a = StM m a
+    liftBaseWith = defaultLiftBaseWith
+    restoreM     = defaultRestoreM
