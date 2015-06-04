@@ -79,7 +79,7 @@ execWriterLazy = WL.execWriterT
 -- the MonadTransControl instance
 newtype CustomWriterT' w n m a = CustomWriterT (Proxied (w -> n ()) m a)
   deriving (Functor, Applicative, Monad, Alternative, MonadPlus, MonadBase b, MonadIO)
-type CustomWriterT w m a = CustomWriterT' w m m a
+type CustomWriterT w m = CustomWriterT' w m m
 
 instance MonadTrans (CustomWriterT' w n) where
   lift a = CustomWriterT $ Proxied $ \_ -> a
