@@ -1,6 +1,6 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving, NoMonomorphismRestriction,
              DataKinds, TypeFamilies, TemplateHaskell, ScopedTypeVariables,
-             MagicHash #-}
+             MagicHash, FlexibleContexts #-}
 import Test.Tasty
 import Test.Tasty.HUnit
 import Control.Monad.Trans.Class
@@ -12,6 +12,7 @@ import Control.Monad.Classes.Run
 import Control.Applicative
 import Control.Exception hiding (throw)
 import Data.Lens.Light
+import Data.Proxy
 import GHC.Prim (Proxy#, proxy#)
 
 -- for IO tests
@@ -45,6 +46,7 @@ tests = testGroup "Tests"
   , liftNTests
   , liftConduitTest
   , mapWriterTest
+  , readStateTest
   ]
 
 simpleStateTests = testGroup "Simple State"
@@ -154,3 +156,13 @@ liftConduitTest = testCase "lift conduit" $
 
 mapWriterTest = testCase "mapWriter" $ do
   run (execWriterStrict $ mapWriter (\(w :: Char) -> [w]) $ do { tell 'a'; tell 'b'; tell 'c' }) @?= "abc"
+
+readStateTest = testCase "ReadState" $ do
+  let
+    a1 :: MonadReader Char m => m Char
+    a1 = ask
+
+    a2 :: MonadState Char m => m Char
+    a2 = runReadState (Proxy :: Proxy Char) a1
+
+  run (evalStateStrict 'w' a2) @?= 'w'
