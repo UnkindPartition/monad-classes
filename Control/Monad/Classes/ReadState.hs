@@ -4,6 +4,7 @@ import Control.Monad.Classes.Core
 import Control.Monad.Classes.Effects
 import Control.Monad.Classes.Reader
 import Control.Monad.Classes.State
+import Control.Monad.Trans.Class
 import Control.Applicative
 import Data.Proxy
 
@@ -17,6 +18,9 @@ import Data.Proxy
 -- requests.
 newtype ReadStateT s m a = ReadStateT (m a)
   deriving (Functor, Applicative, Monad)
+
+instance MonadTrans (ReadStateT s) where
+  lift = ReadStateT
 
 runReadState :: Proxy s -> ReadStateT s m a -> m a
 runReadState _ (ReadStateT a) = a
