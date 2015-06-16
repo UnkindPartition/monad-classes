@@ -35,7 +35,7 @@ module Control.Monad.Classes.Run
   , runZoom
   , ZoomT(..)
     -- * ReadState
-  , ReadState(..)
+  , ReadStateT(..)
   , runReadState
   ) where
 
