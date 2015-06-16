@@ -27,7 +27,8 @@ library
     Control.Monad.Classes.Exec,
     Control.Monad.Classes.Zoom,
     Control.Monad.Classes.Core,
-    Control.Monad.Classes.Effects
+    Control.Monad.Classes.Effects,
+    Control.Monad.Classes.ReadState
   build-depends:
     base >=4.7,
     mmorph >= 1.0.3,

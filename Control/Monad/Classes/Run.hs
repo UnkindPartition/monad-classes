@@ -34,6 +34,9 @@ module Control.Monad.Classes.Run
     -- * Zoom
   , runZoom
   , ZoomT(..)
+    -- * ReadState
+  , ReadState(..)
+  , runReadState
   ) where
 
 import Data.Functor.Identity
@@ -42,6 +45,7 @@ import Control.Monad.Classes.State
 import Control.Monad.Classes.Writer
 import Control.Monad.Classes.Reader
 import Control.Monad.Classes.Except
+import Control.Monad.Classes.ReadState
 
 run :: Identity a -> a
 run = runIdentity
