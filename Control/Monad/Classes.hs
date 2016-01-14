@@ -1,6 +1,7 @@
 module Control.Monad.Classes
   ( -- * State
     MonadState
+  , state
   , get
   , put
   , modify
