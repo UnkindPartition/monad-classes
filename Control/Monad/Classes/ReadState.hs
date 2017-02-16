@@ -6,7 +6,6 @@ import Control.Monad.Classes.Reader
 import Control.Monad.Classes.State
 import Control.Monad.Trans.Identity
 import Control.Monad.Trans.Class
-import Control.Applicative
 import Control.Monad.Base
 import Control.Monad.Trans.Control
 import Data.Proxy
@@ -28,10 +27,10 @@ runReadState _ (ReadStateT (IdentityT a)) = a
 type instance CanDo (ReadStateT s m) eff = ReadStateCanDo s eff
 
 type family ReadStateCanDo s eff where
-  ReadStateCanDo s (EffReader s) = True
-  ReadStateCanDo s eff = False
+  ReadStateCanDo s (EffReader s) = 'True
+  ReadStateCanDo s eff = 'False
 
-instance MonadState s m => MonadReaderN Zero s (ReadStateT s m) where
+instance MonadState s m => MonadReaderN 'Zero s (ReadStateT s m) where
   askN _ = ReadStateT (IdentityT get)
 
 instance MonadBase b m => MonadBase b (ReadStateT x m) where

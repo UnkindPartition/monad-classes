@@ -24,8 +24,8 @@ type family FindTrue
   (bs :: [Bool]) -- results of calling Contains
   :: Nat
   where
-  FindTrue (True ': t) = Zero
-  FindTrue (False ': t) = Suc (FindTrue t)
+  FindTrue ('True ': t) = 'Zero
+  FindTrue ('False ': t) = 'Suc (FindTrue t)
 
 -- | @'Find' eff m@ finds the first transformer in a monad transformer
 -- stack that can handle the effect @eff@
@@ -37,16 +37,16 @@ class MonadLiftN (n :: Nat) m
     type Down n m :: * -> *
     liftN :: Proxy# n -> Down n m a -> m a
 
-instance MonadLiftN Zero m
+instance MonadLiftN 'Zero m
   where
-    type Down Zero m = m
+    type Down 'Zero m = m
     liftN _ = id
 
 instance
   ( MonadLiftN n m
   , MonadTrans t
   , Monad m
-  ) => MonadLiftN (Suc n) (t m)
+  ) => MonadLiftN ('Suc n) (t m)
   where
-    type Down (Suc n) (t m) = Down n m
+    type Down ('Suc n) (t m) = Down n m
     liftN _ = lift . liftN (proxy# :: Proxy# n)

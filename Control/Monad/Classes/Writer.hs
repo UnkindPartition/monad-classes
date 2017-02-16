@@ -19,33 +19,33 @@ type instance CanDo (WS.WriterT w m) eff = WriterCanDo w eff
 type instance CanDo (CustomWriterT' w n m) eff = WriterCanDo w eff
 
 type family WriterCanDo w eff where
-  WriterCanDo w (EffWriter w) = True
-  WriterCanDo w eff = False
+  WriterCanDo w (EffWriter w) = 'True
+  WriterCanDo w eff = 'False
 
 class Monad m => MonadWriterN (n :: Nat) w m where
   tellN :: Proxy# n -> (w -> m ())
 
-instance (Monad m, Monoid w) => MonadWriterN Zero w (WL.WriterT w m) where
+instance (Monad m, Monoid w) => MonadWriterN 'Zero w (WL.WriterT w m) where
   tellN _ = WL.tell
 
-instance (Monad m, Monoid w) => MonadWriterN Zero w (WS.WriterT w m) where
+instance (Monad m, Monoid w) => MonadWriterN 'Zero w (WS.WriterT w m) where
   tellN _ = WS.tell
 
-instance (Monad m, Monoid w) => MonadWriterN Zero w (SL.StateT w m) where
+instance (Monad m, Monoid w) => MonadWriterN 'Zero w (SL.StateT w m) where
   -- lazy
   tellN _ w = SL.modify (<> w)
 
-instance (Monad m, Monoid w) => MonadWriterN Zero w (SS.StateT w m) where
+instance (Monad m, Monoid w) => MonadWriterN 'Zero w (SS.StateT w m) where
   tellN _ w = modify' (<> w)
     where
       modify' :: (s -> s) -> SS.StateT s m ()
       modify' f = SS.state (\s -> let s' = f s in s' `seq` ((), s'))
 
-instance Monad m => MonadWriterN Zero w (CustomWriterT' w m m) where
+instance Monad m => MonadWriterN 'Zero w (CustomWriterT' w m m) where
   tellN _ w = CustomWriterT $ Proxied $ \px -> reflect px w
 
 instance (MonadTrans t, Monad (t m), MonadWriterN n w m, Monad m)
-  => MonadWriterN (Suc n) w (t m)
+  => MonadWriterN ('Suc n) w (t m)
   where
     tellN _ = lift . tellN (proxy# :: Proxy# n)
 
@@ -57,7 +57,7 @@ type MonadWriter w m = MonadWriterN (Find (EffWriter w) m) w m
 tell :: forall w m . MonadWriter w m => w -> m ()
 tell = tellN (proxy# :: Proxy# (Find (EffWriter w) m))
 
-runWriterStrict :: (Monad m, Monoid w) => SS.StateT w m a -> m (a, w)
+runWriterStrict :: (Monoid w) => SS.StateT w m a -> m (a, w)
 runWriterStrict = flip SS.runStateT mempty
 
 evalWriterStrict :: (Monad m, Monoid w) => SS.StateT w m a -> m a
@@ -66,13 +66,13 @@ evalWriterStrict = flip SS.evalStateT mempty
 execWriterStrict :: (Monad m, Monoid w) => SS.StateT w m a -> m w
 execWriterStrict = flip SS.execStateT mempty
 
-runWriterLazy :: (Monad m, Monoid w) => WL.WriterT w m a -> m (a, w)
+runWriterLazy :: WL.WriterT w m a -> m (a, w)
 runWriterLazy = WL.runWriterT
 
-evalWriterLazy :: (Monad m, Monoid w) => WL.WriterT w m a -> m a
+evalWriterLazy :: (Monad m) => WL.WriterT w m a -> m a
 evalWriterLazy = liftM fst . runWriterLazy
 
-execWriterLazy :: (Monad m, Monoid w) => WL.WriterT w m a -> m w
+execWriterLazy :: (Monad m) => WL.WriterT w m a -> m w
 execWriterLazy = WL.execWriterT
 
 -- The separation between 'n' and 'm' types is needed to implement

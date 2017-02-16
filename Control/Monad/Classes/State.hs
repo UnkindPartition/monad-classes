@@ -10,23 +10,23 @@ type instance CanDo (SS.StateT s m) eff = StateCanDo s eff
 type instance CanDo (SL.StateT s m) eff = StateCanDo s eff
 
 type family StateCanDo s eff where
-  StateCanDo s (EffState s) = True
-  StateCanDo s (EffReader s) = True
-  StateCanDo s (EffLocal s) = True
-  StateCanDo s (EffWriter s) = True
-  StateCanDo s eff = False
+  StateCanDo s (EffState s) = 'True
+  StateCanDo s (EffReader s) = 'True
+  StateCanDo s (EffLocal s) = 'True
+  StateCanDo s (EffWriter s) = 'True
+  StateCanDo s eff = 'False
 
 class Monad m => MonadStateN (n :: Nat) s m where
   stateN :: Proxy# n -> ((s -> (a, s)) -> m a)
 
-instance Monad m => MonadStateN Zero s (SL.StateT s m) where
+instance Monad m => MonadStateN 'Zero s (SL.StateT s m) where
   stateN _ = SL.state
 
-instance Monad m => MonadStateN Zero s (SS.StateT s m) where
+instance Monad m => MonadStateN 'Zero s (SS.StateT s m) where
   stateN _ = SS.state
 
 instance (Monad (t m), MonadTrans t, MonadStateN n s m, Monad m)
-  => MonadStateN (Suc n) s (t m)
+  => MonadStateN ('Suc n) s (t m)
   where
     stateN _ = lift . stateN (proxy# :: Proxy# n)
 

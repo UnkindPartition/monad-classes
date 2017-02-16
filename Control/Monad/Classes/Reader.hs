@@ -11,31 +11,31 @@ import Control.Monad.Classes.Effects
 type instance CanDo (R.ReaderT e m) eff = ReaderCanDo e eff
 
 type family ReaderCanDo e eff where
-  ReaderCanDo e (EffReader e) = True
-  ReaderCanDo e (EffLocal e) = True
-  ReaderCanDo e eff = False
+  ReaderCanDo e (EffReader e) = 'True
+  ReaderCanDo e (EffLocal e) = 'True
+  ReaderCanDo e eff = 'False
 
 class Monad m => MonadReaderN (n :: Nat) r m where
   askN :: Proxy# n -> m r
 
-instance Monad m => MonadReaderN Zero r (R.ReaderT r m) where
+instance Monad m => MonadReaderN 'Zero r (R.ReaderT r m) where
   askN _ = R.ask
 
-instance Monad m => MonadReaderN Zero r (SL.StateT r m) where
+instance Monad m => MonadReaderN 'Zero r (SL.StateT r m) where
   askN _ = SL.get
 
-instance Monad m => MonadReaderN Zero r (SS.StateT r m) where
+instance Monad m => MonadReaderN 'Zero r (SS.StateT r m) where
   askN _ = SS.get
 
 instance (MonadTrans t, Monad (t m), MonadReaderN n r m, Monad m)
-  => MonadReaderN (Suc n) r (t m)
+  => MonadReaderN ('Suc n) r (t m)
   where
     askN _ = lift $ askN (proxy# :: Proxy# n)
 
 class Monad m => MonadLocalN (n :: Nat) r m where
   localN :: Proxy# n -> ((r -> r) -> m a -> m a)
 
-instance Monad m => MonadLocalN Zero r (R.ReaderT r m) where
+instance Monad m => MonadLocalN 'Zero r (R.ReaderT r m) where
   localN _ = R.local
 
 stateLocal :: Monad m => (a -> m ()) -> m a -> (a -> a) -> m b -> m b
@@ -46,14 +46,14 @@ stateLocal putFn getFn f a = do
   putFn s
   return r
 
-instance (Monad m) => MonadLocalN Zero r (SL.StateT r m) where
+instance (Monad m) => MonadLocalN 'Zero r (SL.StateT r m) where
   localN _ = stateLocal SL.put SL.get
 
-instance (Monad m) => MonadLocalN Zero r (SS.StateT r m) where
+instance (Monad m) => MonadLocalN 'Zero r (SS.StateT r m) where
   localN _ = stateLocal SS.put SS.get
 
-instance (MonadTrans t, Monad (t m), MFunctor t, MonadLocalN n r m, Monad m)
-  => MonadLocalN (Suc n) r (t m)
+instance (Monad (t m), MFunctor t, MonadLocalN n r m, Monad m)
+  => MonadLocalN ('Suc n) r (t m)
   where
     localN _ = \f -> hoist (localN (proxy# :: Proxy# n) f)
 

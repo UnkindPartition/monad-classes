@@ -68,7 +68,7 @@ newtype Foo m a = Foo { runFoo :: m a }
   deriving (Functor, Applicative, Monad)
 instance MonadTrans Foo where
   lift = Foo
-type instance CanDo (Foo m) eff = False
+type instance CanDo (Foo m) eff = 'False
 
 liftingTest = testCase "Lifting through an unknown transformer" $
   (run $ runStateLazy 'a' $ runFoo $ runStateLazy False twoStatesComp) @?= (((), True), 'c')
@@ -115,7 +115,7 @@ zoomTests = testCase "Zoom" $ do
 
 liftNTests = testCase "liftN" $ do
   (run $ runReader 'a' $ runReader 'b' $ runReader 'c' $
-    liftN (proxy# :: Proxy# (Suc Zero)) R.ask)
+    liftN (proxy# :: Proxy# ('Suc 'Zero)) R.ask)
   @?= 'b'
 
 
@@ -141,7 +141,7 @@ liftConduitTest = testCase "lift conduit" $
       C.await >>=
         maybe (return ()) (\x -> do lift $ tell [x::Int]; sink)
    in
-    W.execWriter $ hoist (liftN (proxy# :: Proxy# (Suc Zero))) src C.$$ sink
+    W.execWriter $ hoist (liftN (proxy# :: Proxy# ('Suc 'Zero))) src C.$$ sink
   ) @?= [1,2]
   {-
 

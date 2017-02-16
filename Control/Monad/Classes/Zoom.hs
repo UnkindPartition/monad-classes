@@ -42,16 +42,16 @@ runZoom l a =
 type instance CanDo (ZoomT big small m) eff = ZoomCanDo small eff
 
 type family ZoomCanDo s eff where
-  ZoomCanDo s (EffState s) = True
-  ZoomCanDo s (EffReader s) = True
-  ZoomCanDo s (EffWriter s) = True
-  ZoomCanDo s eff = False
+  ZoomCanDo s (EffState s) = 'True
+  ZoomCanDo s (EffReader s) = 'True
+  ZoomCanDo s (EffWriter s) = 'True
+  ZoomCanDo s eff = 'False
 
-instance MonadReader big m => MonadReaderN Zero small (ZoomT big small m)
+instance MonadReader big m => MonadReaderN 'Zero small (ZoomT big small m)
   where
   askN _ = ZoomT $ Proxied $ \px -> vlGet (reflect px) `liftM` ask
 
-instance MonadState big m => MonadStateN Zero small (ZoomT big small m)
+instance MonadState big m => MonadStateN 'Zero small (ZoomT big small m)
   where
   stateN _ f = ZoomT $ Proxied $ \px ->
     let l = reflect px in
@@ -59,7 +59,7 @@ instance MonadState big m => MonadStateN Zero small (ZoomT big small m)
       case f (vlGet l s) of
         (a, t') -> (a, vlSet l t' s)
 
-instance (MonadState big m, Monoid small) => MonadWriterN Zero small (ZoomT big small m)
+instance (MonadState big m, Monoid small) => MonadWriterN 'Zero small (ZoomT big small m)
   where
   tellN _ w = ZoomT $ Proxied $ \px ->
     let l = reflect px in
