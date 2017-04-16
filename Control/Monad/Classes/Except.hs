@@ -43,8 +43,10 @@ type MonadExcept e m = MonadExceptN (Find (EffExcept e) m) e m
 throw :: forall a e m . MonadExcept e m => e -> m a
 throw = throwN (proxy# :: Proxy# (Find (EffExcept e) m))
 
+-- | Run an 'MonadExcept' effect using 'Exc.ExceptT'.
 runExcept :: Exc.ExceptT e m a -> m (Either e a)
 runExcept = Exc.runExceptT
 
+-- | Run an 'MonadExcept' effect using 'Exc.MaybeT'.
 runMaybe :: Mb.MaybeT m a -> m (Maybe a)
 runMaybe = Mb.runMaybeT

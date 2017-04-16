@@ -62,17 +62,42 @@ modify f = state (\s -> ((), f s))
 modify' :: MonadState s m => (s -> s) -> m ()
 modify' f = state (\s -> let s' = f s in s' `seq` ((), s'))
 
+-- | Run a 'MonadState' effect using lazy 'SL.StateT'.
+--
+-- This is a flipped 'SL.runStateT'.
 runStateLazy   :: s -> SL.StateT s m a -> m (a, s)
 runStateLazy   =  flip SL.runStateT
+
+-- | Run a 'MonadState' effect using strict 'SS.StateT'.
+--
+-- This is a flipped 'SS.runStateT'.
 runStateStrict :: s -> SS.StateT s m a -> m (a, s)
 runStateStrict =  flip SS.runStateT
 
+-- | Run a 'MonadState' effect using lazy 'SL.StateT', discarding the final
+-- state.
+--
+-- This is a flipped 'SL.evalStateT'.
 evalStateLazy   :: Monad m => s -> SL.StateT s m a -> m a
 evalStateLazy   =  flip SL.evalStateT
+
+-- | Run a 'MonadState' effect using strict 'SS.StateT', discarding the final
+-- state.
+--
+-- This is a flipped 'SS.evalStateT'.
 evalStateStrict :: Monad m => s -> SS.StateT s m a -> m a
 evalStateStrict =  flip SS.evalStateT
 
+-- | Run a 'MonadState' effect using lazy 'SL.StateT', discarding the final
+-- value.
+--
+-- This is a flipped 'SL.execStateT'.
 execStateLazy   :: Monad m => s -> SL.StateT s m a -> m s
 execStateLazy   = flip SL.execStateT
+
+-- | Run a 'MonadState' effect using strict 'SS.StateT', discarding the final
+-- value.
+--
+-- This is a flipped 'SS.execStateT'.
 execStateStrict :: Monad m => s -> SS.StateT s m a -> m s
 execStateStrict = flip SS.execStateT
