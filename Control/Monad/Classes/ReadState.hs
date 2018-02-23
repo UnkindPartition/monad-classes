@@ -37,7 +37,7 @@ instance MonadBase b m => MonadBase b (ReadStateT x m) where
   liftBase = lift . liftBase
 
 instance MonadTransControl (ReadStateT x) where
-  type StT (ReadStateT s) a = StT IdentityT a
+  type StT (ReadStateT x) a = StT IdentityT a
   liftWith = defaultLiftWith ReadStateT (\(ReadStateT a) -> a)
   restoreT = defaultRestoreT ReadStateT
 
